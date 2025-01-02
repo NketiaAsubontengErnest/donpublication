@@ -1,0 +1,55 @@
+.popup{
+    position: absolute;
+    top:-150%;
+    left:50%;
+    opacity: 0;
+    width: 400px;
+    transform: translate(-50%, -50%) scale(1.25);
+    padding: 10px 10px;
+    background: rgb(148, 155, 237);
+    box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0, 15);
+    border-radius: 10px;
+    transition: top 0ms ease-in-out 200ms,
+                opacity 200ms ease-in-out 0ms,
+                transform 20ms ease-in-out 0ms;
+}
+
+.popup-level{
+    position: absolute;
+    top:-150%;
+    left:50%;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.25);
+    padding: 10px 10px;
+    background: rgb(148, 155, 237);
+    box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0, 15);
+    border-radius: 10px;
+    transition: top 0ms ease-in-out 200ms,
+                opacity 200ms ease-in-out 0ms,
+                transform 20ms ease-in-out 0ms;
+}
+
+.popup.activepop{
+    top: 50%;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    transition: top 0ms ease-in-out 0ms,
+                opacity 200ms ease-in-out 0ms,
+                transform 200ms ease-in-out 0ms;
+}
+
+.popup .close-btn{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    border-color: #eee;
+    background: #e62424;
+    color: #eee;
+    text-align: cen;
+    line-height: 15px;
+    border-radius: 15px;
+    cursor: pointer;
+}
+
