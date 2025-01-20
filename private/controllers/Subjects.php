@@ -204,7 +204,7 @@ class Subjects extends Controller
             return $this->view('access-denied', ['crumbs' => $crumbs,]);
         }
     }
-    
+
     public function editlevel($id = null)
     {
         if (!Auth::logged_in()) {

@@ -128,6 +128,8 @@
                 $query = "SELECT * FROM `visitors` WHERE `seasonid` =$seasid";
                 $data1 = $visitors->query($query);
 
+                $data1 = $visitors->get_Officer($data1);
+
                 $fields = array('Customer Name', 'Contact Person', 'Phone Number', 'Location', 'Region', 'Marketer', 'Work Book', 'Text Book', 'Total Books');
                 $excelData = implode("\t", array_values($fields)) . "\n";
                 if ($data1) {
@@ -151,7 +153,6 @@
                 $arr['search'] = $searching;
                 $query = "SELECT * FROM `visitors` WHERE (`customername` LIKE :search OR `custphone` LIKE :search) AND `seasonid` = $seasid LIMIT $limit OFFSET $offset";
                 $data = $visitors->query($query, $arr);
-                $data = $visitors->get_Officer($data);
             } else {
                 $query = "SELECT * FROM `visitors` WHERE `seasonid` =$seasid";
                 $data1 = $visitors->query($query);
@@ -167,6 +168,8 @@
                     $data = $visitors->query($query);
                 }
             }
+
+            $data = $visitors->get_Officer($data);
 
             //this are for breadcrumb
             $crumbs[] = ['Dashboard', 'dashboard'];
@@ -364,7 +367,7 @@
                         $lineData = array(esc($row->level->class . ' ' . $row->subject->subject . ' ' . $row->booktype->booktype), esc(number_format($row->ttCustreturns->grosquant)), esc(number_format($row->ttCustreturns->ret_quant)), esc(number_format($row->ttCustreturns->grosquant - $row->ttCustreturns->ret_quant)));
                         $excelData .= implode("\t", array_values($lineData)) . "\n";
                     }
-                    export_data_to_excel($fields, $excelData, 'Books_Report_for_'.$dataCkust->customername);
+                    export_data_to_excel($fields, $excelData, 'Books_Report_for_' . $dataCkust->customername);
                 } else {
                     $excelData .= 'No records found...' . "\n";
                 }
@@ -389,7 +392,7 @@
             } else {
                 $crumbs[] = ['Access Denied', ''];
                 return $this->view('access-denied', [
-                    'crumbs' => $crumbs, 
+                    'crumbs' => $crumbs,
                     'actives' => $actives
                 ]);
             }
@@ -413,7 +416,7 @@
             $row = $books->get_Maketer_Sample_Supply($row, $id);
             $row = $books->get_Makerter_Supply($row, $id);
             $row = $books->get_Makerter_Returns($row, $id);
-            
+
 
             if (isset($_POST['exportexl'])) {
                 $data1 = $books->findAll();
@@ -452,7 +455,7 @@
             } else {
                 $crumbs[] = ['Access Denied', ''];
                 return $this->view('access-denied', [
-                    'crumbs' => $crumbs, 
+                    'crumbs' => $crumbs,
                     'actives' => $actives
                 ]);
             }
@@ -481,7 +484,7 @@
                 $data1 = $books->findAll();
                 $data1 = $books->get_Special_Supply($data1, $_GET['type']);
                 $data1 = $books->get_Special_Returns($data1, $_GET['type']);
-                
+
                 $fields = array('Book', 'Qty Supplied',  'Qty Returned', 'Total Supply');
                 $excelData = implode("\t", array_values($fields)) . "\n";
                 if ($data1) {
@@ -528,10 +531,6 @@
             $offset = $pager->offset;
             $marketers = new User();
 
-            $data = $marketers->where('rank', 'marketer', $limit, $offset, "ASC");
-            $data = $marketers->get_total_samp_books($data);
-            $data = $marketers->get_total_books_Shared($data);
-
             if (isset($_POST['exportexl'])) {
                 $data1 = $marketers->where('rank', 'marketer', rotations: "ASC");
                 $data1 = $marketers->get_total_samp_books($data1);
@@ -557,6 +556,15 @@
                     $excelData .= 'No records found...' . "\n";
                 }
             }
+
+            if (Auth::getRank() == 'marketer') {
+                $data = $marketers->where('id', Auth::getId());
+            } else {
+                $data = $marketers->where('rank', 'marketer', rotations: "ASC", limit: $limit, offset: $offset);
+            }
+
+            $data = $marketers->get_total_samp_books($data);
+            $data = $marketers->get_total_books_Shared($data);
 
             //this are for breadcrumb
             $crumbs[] = ['Dashboard', 'dashboard'];

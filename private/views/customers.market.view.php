@@ -103,7 +103,9 @@
                         </form>
                     <?php endif; ?>
                 </div>
-                <?php $pager->display($rows ? count($rows) : 0); ?>
+                <?php if (Auth::access('stores')) : ?>
+                    <?php $pager->display($rows ? count($rows) : 0); ?>
+                <?php endif; ?>
             </div>
         </div>
     </div>
