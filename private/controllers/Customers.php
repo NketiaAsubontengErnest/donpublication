@@ -442,23 +442,16 @@
             $crumbs[] = ['Book Sample', ''];
             $crumbs[] = ['Edit Book Type', ''];
             $actives = 'marketers';
-            if (Auth::access('stores')) {
-                $hiddenSearch = "yeap";
-                return $this->view('customers.addmarkvisited', [
-                    'errors' => $errors,
-                    'crumbs' => $crumbs,
-                    'hiddenSearch' => $hiddenSearch,
-                    'pager' => $pager,
-                    'rows' => $row,
-                    'actives' => $actives
-                ]);
-            } else {
-                $crumbs[] = ['Access Denied', ''];
-                return $this->view('access-denied', [
-                    'crumbs' => $crumbs,
-                    'actives' => $actives
-                ]);
-            }
+
+            $hiddenSearch = "yeap";
+            return $this->view('customers.addmarkvisited', [
+                'errors' => $errors,
+                'crumbs' => $crumbs,
+                'hiddenSearch' => $hiddenSearch,
+                'pager' => $pager,
+                'rows' => $row,
+                'actives' => $actives
+            ]);
         }
 
         public function specialssupply($id = '')
@@ -519,7 +512,7 @@
             }
         }
 
-        public function market($id = '')
+        public function market()
         {
             if (!Auth::logged_in()) {
                 return $this->redirect('login');
@@ -530,6 +523,7 @@
             $pager = new Pager($limit);
             $offset = $pager->offset;
             $marketers = new User();
+            $data1 = array();
 
             if (isset($_POST['exportexl'])) {
                 $data1 = $marketers->where('rank', 'marketer', rotations: "ASC");
