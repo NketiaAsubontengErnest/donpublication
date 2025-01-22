@@ -78,7 +78,7 @@
                  </div>
              </li>
          <?php endif; ?>
-         <?php if (Auth::access('marketer') || Auth::access('verification')) : ?>
+         <?php if (Auth::access('director') || Auth::access('verification')) : ?>
              <li class="nav-item">
                  <a class="nav-link" data-toggle="collapse" href="#tabla" aria-expanded="false" aria-controls="tabla">
                      <i class="mdi mdi-briefcase menu-icon"></i>
