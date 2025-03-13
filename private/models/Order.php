@@ -32,7 +32,7 @@ class Order extends Model
         'get_Officer',
         'get_Type',
         'get_Markerter',
-        'get_RetOfficer',
+        'get_Ret_Officer',
     ];
 
     public function validate($data)
@@ -100,8 +100,10 @@ class Order extends Model
     {
         $verific = new User();
         foreach ($data as $key => $row) {
-            $result = $verific->where('username', $row->retverofficer);
-            $data[$key]->verifiRetcOff = is_array($result) ? $result[0] : array();
+            if (isset($row->retverofficer)) {
+                $result = $verific->where('username', $row->retverofficer);
+                $data[$key]->verifiRetcOff = is_array($result) ? $result[0] : array();
+            }
         }
         return $data;
     }
@@ -115,17 +117,7 @@ class Order extends Model
         }
         return $data;
     }
-    public function get_RetOfficer($data)
-    {
-        $stores = new User();
-        foreach ($data as $key => $row) {
-            if (isset($row->retverofficer)) {
-                $result = $stores->where('username', $row->retverofficer);
-                $data[$key]->retverofficer = is_array($result) ? $result[0] : array();
-            }
-        }
-        return $data;
-    }
+
     public function get_Markerter($data)
     {
         $makerter = new User();

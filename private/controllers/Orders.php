@@ -164,6 +164,68 @@ class Orders extends Controller
         }
     }
 
+    public function all_data($id = null)
+    {
+        if (!Auth::logged_in()) {
+            return $this->redirect('login');
+        }
+        // Setting pagination
+        $limit = 15;
+        $pager = new Pager($limit);
+        $offset = $pager->offset;
+
+        $data = array();
+        $errors = array();
+        $orders = new Order();
+        $books = new Book();
+        $type = new Ordertype();
+
+        if (count($_POST) > 0) {
+            $orderid = $_POST['orderid'];
+            unset($_POST['orderid']);
+
+            if ($orders->validate($_POST)) {
+                $orders->update($id, $_POST);
+                $_SESSION['messsage'] = "Order Data Edited Successfully";
+                $_SESSION['status_code'] = "success";
+                $_SESSION['status_headen'] = "Good job!";
+                return $this->redirect('orders/listprice/' . $orderid);
+            } else {
+                $errors = $orders->errors;
+                $_SESSION['messsage'] = "Order Not Updated";
+                $_SESSION['status_code'] = "error";
+                $_SESSION['status_headen'] = "OOP's!";
+            }
+        }
+
+        $data = $orders->where('id', $id);
+
+        //this are for breadcrumb
+        $crumbs[] = ['Dashboard', 'dashboard'];
+        $crumbs[] = ['Agents', 'agents'];
+        $crumbs[] = ['Edit Agents', ''];
+        $hiddenSearch = "yeap";
+        $actives = 'order';
+        if (Auth::access('director')) {
+            return $this->view('orders.all_data', [
+                'errors' => $errors,
+                'crumbs' => $crumbs,
+                'pager' => $pager,
+                'typedata' => $type->findAll(),
+                'rows' => $data,
+                'hiddenSearch' => $hiddenSearch,
+                'actives' => $actives
+            ]);
+        } else {
+            $crumbs[] = ['Access Denied', ''];
+            return $this->view('access-denied', [
+                'crumbs' => $crumbs,
+                'pager' => $pager,
+                'actives' => $actives
+            ]);
+        }
+    }
+
     public function placeorder($id = null)
     {
         if (!Auth::logged_in()) {
@@ -593,8 +655,8 @@ class Orders extends Controller
             $fields = array('Date', 'Order Number', 'Customer', 'Order Type', 'Markerter');
             $excelData = implode("\t", array_values($fields)) . "\n";
             if ($data1) {
-                foreach ($data1 as $row) {                    
-                    $lineData = array(esc($row->orderdate), esc($row->ordernumber), esc($row->customers->customername), isset($row->ordertypes->typename) ? esc($row->ordertypes->typename) : "", ucfirst(esc($row->makerter->firstname)) . " " . ucfirst(esc($row->makerter->lastname)) );
+                foreach ($data1 as $row) {
+                    $lineData = array(esc($row->orderdate), esc($row->ordernumber), esc($row->customers->customername), isset($row->ordertypes->typename) ? esc($row->ordertypes->typename) : "", ucfirst(esc($row->makerter->firstname)) . " " . ucfirst(esc($row->makerter->lastname)));
                     $excelData .= implode("\t", array_values($lineData)) . "\n";
                 }
             } else {
@@ -732,25 +794,24 @@ class Orders extends Controller
         $offset = $pager->offset;
         $data = array();
         $orders = new Order();
-        $arr = array();        
+        $arr = array();
 
         if (count($_POST) > 0) {
             $direct = "orders";
             $_SESSION['messsage'] = "Order Removed Successfully";
             $_SESSION['status_code'] = "success";
             $_SESSION['status_headen'] = "Good job!";
-            
+
             if (count($_POST) > 0 && Auth::access('stores')) {
                 $_POST['issureid'] = Auth::getUsername();
                 if (isset($_POST['removeorder'])) {
                     $orderid = $_POST['removeorder'];
                     $query = "DELETE FROM `orders` WHERE `id` =$orderid";
                     $direct = "orders/list/$id";
-                    
                 } else
                 if ($orders->validate($_POST) && isset($_POST['use'])) {
                     unset($_POST['use']);
-                    
+
                     $query = "UPDATE `orders` SET `issureid`=:issureid WHERE `ordernumber` = $id";
                     $orders->query($query, $_POST);
                     $_SESSION['messsage'] = "Order Issued Successfully";
@@ -767,17 +828,16 @@ class Orders extends Controller
                 $_SESSION['messsage'] = "Order Accepted Successfully";
                 $_SESSION['status_code'] = "success";
                 $_SESSION['status_headen'] = "Thank You!";
-            } 
-            
+            }
+
             if (isset($_POST['removeorder'])) {
                 $orderid = $_POST['removeorder'];
                 $query = "DELETE FROM `orders` WHERE `id` =$orderid";
                 $direct = "orders/list/$id";
-            } 
-            
-            
+            }
+
+
             if (isset($_POST['canc'])) {
-                
                 $query = "DELETE FROM `orders` WHERE `ordernumber` =$id";
             }
 
@@ -991,7 +1051,7 @@ class Orders extends Controller
                         REGION
                     </td>
                     <td>
-                        '.esc($data[0]->customers->region).'
+                        ' . esc($data[0]->customers->region) . '
                     </td>                 
                 </tr>
             </table> 
@@ -1621,7 +1681,7 @@ class Orders extends Controller
         }
 
         if (count($_POST) > 0 && isset($_POST['declinetdisc']) && Auth::access('g-account')) {
-            
+
             $query = "UPDATE `orders` SET `updatediscount` = '0' WHERE `ordernumber` = :declinetdisc";
             $custom = $_POST['custname'];
             $olddisc = $_POST['discount'];

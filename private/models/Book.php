@@ -122,7 +122,7 @@ class Book extends Model
          $arr['seasonid'] = $seasid;
          $arr['officerid'] = $id;
 
-         $query = "SELECT SUM(`quantsupp`) AS ttMarketSupply, (`retverquant`) AS retsample FROM `orders` JOIN `customers` ON customers.`id` = `customerid` WHERE customers.`custtype` = 'school' AND `bookid` =:bookid AND `seasonid`=:seasonid AND orders.`officerid` =:officerid AND `ordertype` != '1'";
+         $query = "SELECT SUM(`quantsupp`) AS ttMarketSupply, (`retverquant`) AS retsample, (SUM(`quantsupp` - `retverquant`) * `unitprice`) AS book_gross, ((SUM(`quantsupp` - `retverquant`) * `unitprice`) * ((100-`discount`)/100)) AS book_net FROM `orders` JOIN `customers` ON customers.`id` = `customerid` WHERE customers.`custtype` = 'school' AND `bookid` =:bookid AND `seasonid`=:seasonid AND orders.`officerid` =:officerid AND `ordertype` != '1'";
          $result = $order->query($query, $arr);
          $data[$key]->ttMarketSupply = is_array($result) ? $result[0] : array();
       }

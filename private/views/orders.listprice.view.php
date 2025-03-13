@@ -45,7 +45,7 @@
                                 <div class="col-lg-4">
                                     <label>Discount %</label>
                                     <div class="input-group ">
-                                        <input name="discount" value="<?=$rows[0]->discount != 0.00 ? esc(number_format($rows[0]->discount, 0)) : '' ?>" class="typeahead" type="text" placeholder="15" required>
+                                        <input name="discount" value="<?= $rows[0]->discount != 0.00 ? esc(number_format($rows[0]->discount, 0)) : '' ?>" class="typeahead" type="text" placeholder="15" required>
                                         <?php if ($rows[0]->updatediscount != 0) : ?>
                                             <label>Changed to <?= esc($rows[0]->updatediscount) ?>%</label>
                                         <?php endif ?>
@@ -68,7 +68,7 @@
                                                 <button name="disc" value="<?= esc($disc) ?>" class="btn <?= $rows[0]->discount > 0.00 ? 'btn-danger' : 'btn-primary' ?>">
                                                     <i class="mdi mdi-check-all"> Apply</i>
                                                 </button>
-                                            <?php else : ?>                                                
+                                            <?php else : ?>
                                                 <input type="text" name="olddisc" value="<?= esc($rows[0]->discount) ?>" hidden>
                                                 <label>&nbsp &nbsp &nbsp</label>
                                                 <button name="editdisc" value="<?= esc($disc) ?>" class="btn btn-primary">
@@ -101,6 +101,9 @@
                                         Quantity Returned
                                     </th>
                                     <th>
+                                        Accepted Returned
+                                    </th>
+                                    <th>
                                         Discount (%)
                                     </th>
                                     <th>
@@ -129,6 +132,9 @@
                                                 <?php if (($row->quantsupp) > 0) : ?>
                                                     <?= esc($row->quantsupp) ?>
                                                 <?php endif; ?>
+                                            </td>
+                                            <td>
+                                                <?= esc($row->retverquantacc) ?>
                                             </td>
                                             <td>
                                                 <?= esc($row->retverquant) ?>
@@ -184,6 +190,13 @@
                                             <?php else : ?>
                                                 <td></td>
                                             <?php endif; ?>
+                                            <?php if (Auth::getRank() == 'director') : ?>
+                                                <td>
+                                                    <a href="<?= HOME ?>/orders/all_data/<?= $row->id ?>">
+                                                        <i class="m-2 mdi mdi-backup-restore">Edit All Data</i>
+                                                    </a>
+                                                </td>
+                                            <?php endif ?>
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php else : ?>

@@ -23,29 +23,29 @@ class Returns extends Controller
         if (isset($_GET['search_box'])) {
             $searching = '%' . $_GET['search_box'] . '%';
             if (Auth::access('marketer')) {
-                $query = "SELECT orders.*, customers.customername FROM `orders` LEFT JOIN customers ON orders.customerid = customers.id  WHERE `retquant` != 0 AND `officerid` = " . Auth::getId() . " AND orders.`seasonid` ={$seasid} AND  (customers.customername LIKE :search OR orders.ordernumber LIKE :search) GROUP BY `ordernumber` ORDER BY `retdate` DESC";
+                $query = "SELECT orders.*, customers.customername FROM `orders` LEFT JOIN customers ON orders.customerid = customers.id  WHERE `retquant` != 0 AND orders.`officerid` = " . Auth::getId() . " AND orders.`seasonid` ={$seasid} AND  (customers.customername LIKE :search OR orders.ordernumber LIKE :search) GROUP BY `ordernumber` ORDER BY `retdate` DESC LIMIT $limit OFFSET $offset";
             }
             if (Auth::access('stores')) {
-                $query = "SELECT orders.*, customers.customername FROM `orders` LEFT JOIN customers ON orders.customerid = customers.id  WHERE `retverquantacc` != 0 AND orders.`seasonid` ={$seasid} AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search) GROUP BY `ordernumber` ORDER BY `retdate` DESC";
+                $query = "SELECT orders.*, customers.customername FROM `orders` LEFT JOIN customers ON orders.customerid = customers.id  WHERE `retverquantacc` != 0 AND orders.`seasonid` ={$seasid} AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search) GROUP BY `ordernumber` ORDER BY `retdate` DESC LIMIT $limit OFFSET $offset";
             }
             if (Auth::access('verification')) {
-                $query = "SELECT orders.*, customers.customername FROM `orders` LEFT JOIN customers ON orders.customerid = customers.id  WHERE `retverquantacc` != 0 AND orders.`seasonid` ={$seasid} AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search) GROUP BY `ordernumber` ORDER BY `retdate` DESC";
+                $query = "SELECT orders.*, customers.customername FROM `orders` LEFT JOIN customers ON orders.customerid = customers.id  WHERE `retverquantacc` != 0 AND orders.`seasonid` ={$seasid} AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search) GROUP BY `ordernumber` ORDER BY `retdate` DESC LIMIT $limit OFFSET $offset";
             }
 
             $arr['search'] = $searching;
         } else {
             if (Auth::access('marketer')) {
-                $query = "SELECT * FROM `orders` WHERE `retquant` != 0 AND orders.`seasonid` ={$seasid} AND `officerid` = " . Auth::getId() . " GROUP BY `ordernumber` ORDER BY `retdate` DESC";
+                $query = "SELECT * FROM `orders` WHERE `retquant` != 0 AND orders.`seasonid` ={$seasid} AND `officerid` = " . Auth::getId() . " GROUP BY `ordernumber` ORDER BY `retdate` DESC LIMIT $limit OFFSET $offset";
             }
             if (Auth::access('stores')) {
-                $query = "SELECT * FROM `orders` WHERE `retverquant` !=0 AND orders.`seasonid` ={$seasid} GROUP BY `ordernumber` ORDER BY `retdate` DESC";
+                $query = "SELECT * FROM `orders` WHERE `retverquant` !=0 AND orders.`seasonid` ={$seasid} GROUP BY `ordernumber` ORDER BY `retdate` DESC LIMIT $limit OFFSET $offset";
             }
             if (Auth::access('verification')) {
-                $query = "SELECT * FROM `orders` WHERE `retverquantacc` != 0 AND orders.`seasonid` ={$seasid} GROUP BY `ordernumber` ORDER BY `retdate` DESC";
+                $query = "SELECT * FROM `orders` WHERE `retverquantacc` != 0 AND orders.`seasonid` ={$seasid} GROUP BY `ordernumber` ORDER BY `retdate` DESC LIMIT $limit OFFSET $offset";
             }
         }
 
-        $data = $orders->findAllDistinct($query, $arr, $limit, $offset);
+        $data = $orders->findAllDistinct($query, $arr);
 
 
         //this are for breadcrumb
@@ -294,7 +294,7 @@ class Returns extends Controller
                     $_POST['accountofficer'] = '';
                     $_POST['pricedate'] = '';
 
-                    if ($da->retquant > 0) {
+                    if ($da->retquant > 0 && $da->retverquantacc < $da->retquant) {
                         $query = "UPDATE `orders` SET `retverquantacc`=`retquant`, `retverofficer`=:verificid, `retdate`=:retdate WHERE `id` =:orderid";
 
                         $orders->query($query, $_POST);
@@ -476,7 +476,7 @@ class Returns extends Controller
             ]);
         }
     }
-   
+
     public function del($id = null)
     {
         if (!Auth::logged_in()) {

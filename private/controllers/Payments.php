@@ -164,7 +164,7 @@ class Payments extends Controller
                     } catch (\Throwable $th) {
                         //throw $th;
                     }
-                    $lineData = array(esc($row->customername), esc($row->custphone), esc($row->region), esc($row->custtype), esc($row->custlocation), esc($row->firstname) . " " . esc($row->lastname), esc(number_format($row->amout_disco->totaldept, 2)), esc(number_format($row->amout_disco->totalReturns, 2)), esc(number_format($returns)) . '%', esc(number_format($row->amout_disco->total_net_returns, 2)), esc(number_format($row->amout_disco->totaldisc, 2)), esc(number_format($discoutper).'%'), esc(number_format($netamt, 2)), esc(number_format($row->totalpayment->totalpayed, 2)), esc(number_format($recovery)) . '%', esc(number_format(($netamt - ($row->totalpayment->totalpayed)), 2)), esc(number_format($balance)) . '%');
+                    $lineData = array(esc($row->customername), esc($row->custphone), esc($row->region), esc($row->custtype), esc($row->custlocation), esc($row->firstname) . " " . esc($row->lastname), esc(number_format($row->amout_disco->totaldept, 2)), esc(number_format($row->amout_disco->totalReturns, 2)), esc(number_format($returns)) . '%', esc(number_format($row->amout_disco->total_net_returns, 2)), esc(number_format($row->amout_disco->totaldisc, 2)), esc(number_format($discoutper) . '%'), esc(number_format($netamt, 2)), esc(number_format($row->totalpayment->totalpayed, 2)), esc(number_format($recovery)) . '%', esc(number_format(($netamt - ($row->totalpayment->totalpayed)), 2)), esc(number_format($balance)) . '%');
                     $excelData .= implode("\t", array_values($lineData)) . "\n";
                 }
             } else {
@@ -910,8 +910,8 @@ class Payments extends Controller
                 $progitData['seasonid'] = $_SESSION['seasondata']->id;
                 if ($progitData['tithe'] > 0) {
                     $tithe->insert($progitData);
+                    $_POST['titheid'] = $tithe->selctingId()[0]->id;
                 }
-                
 
                 $payments->insert($_POST);
                 return $this->redirect('payments/viewpayments/' . $id);
@@ -978,23 +978,46 @@ class Payments extends Controller
 
         $errors = array();
         $payments = new Payment();
+        $tithes = new Tithe();
         $users = new User();
+
+        $acti = new Activitylog();
+        $acs = [];
 
         $rows = array();
 
         $arr['officerid'] = $id;
         $seasid = $_SESSION['seasondata'] != null ? $_SESSION['seasondata']->id : "";
 
+        if (count($_POST) > 0) {
+            $payments->query("DELETE FROM `payments` WHERE `id` =:id", ['id' => $_POST['payid']]);
+
+            if ($_POST['titheid'] !== null) {
+                $tithes->query("DELETE FROM `tithes` WHERE `id` =:id", ['id' => $_POST['titheid']]);
+            }
+
+            $acs['activity'] = "Payment of " . $_POST['amount'] . " is Deleted From " . $_POST['customer'] . " by " . Auth::getFirstname() . ' ' . Auth::getLastname();
+            $acs['loclink'] = "";
+            $acs['userid'] = Auth::getUsername();
+
+            //viewpayments
+            $acti->insert($acs);
+
+            $_SESSION['messsage'] = "Payment Deleted Successfully Approved";
+            $_SESSION['status_code'] = "success";
+            $_SESSION['status_headen'] = "Good job!";
+            return $this->redirect('payments/officerpayments/' . $id);
+        }
+
         if (isset($_GET['search_box'])) {
             $searching = '%' . $_GET['search_box'] . '%';
-            $query = "SELECT * FROM `payments` JOIN customers  ON payments.customerid = customers.id WHERE customers.custtype = 'school' AND payments.`officerid` =:officerid AND payments.`seasonid` ={$seasid} AND (`transid` LIKE :searchs OR customers.`customername` LIKE :searchs OR `reciept` LIKE :searchs) ORDER BY payments.id DESC LIMIT $limit OFFSET $offset";
+            $query = "SELECT payments.*, payments.id as pid, customers.* FROM `payments` JOIN customers  ON payments.customerid = customers.id WHERE customers.custtype = 'school' AND payments.`officerid` =:officerid AND payments.`seasonid` ={$seasid} AND (`transid` LIKE :searchs OR customers.`customername` LIKE :searchs OR `reciept` LIKE :searchs) ORDER BY payments.id DESC LIMIT $limit OFFSET $offset";
             $arr['searchs'] = $searching;
             $row = $payments->query($query, $arr);
         } else {
-            $query = "SELECT * FROM `payments` JOIN customers  ON payments.customerid = customers.id WHERE customers.custtype = 'school' AND payments.`officerid` =:officerid AND payments.`seasonid` ={$seasid} ORDER BY payments.id DESC LIMIT $limit OFFSET $offset";
+            $query = "SELECT payments.*, payments.id as pid, customers.* FROM `payments` JOIN customers  ON payments.customerid = customers.id WHERE customers.custtype = 'school' AND payments.`officerid` =:officerid AND payments.`seasonid` ={$seasid} ORDER BY payments.id DESC LIMIT $limit OFFSET $offset";
             $row = $payments->query($query, $arr);
         }
-
         $row = $payments->get_Customer($row);
 
         $rows = $users->where('id', $id)[0];
