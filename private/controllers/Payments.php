@@ -683,6 +683,7 @@ class Payments extends Controller
         $errors = array();
         $payments = new Payment();
         $acti = new Activitylog();
+        $banks = new Bank();
         $acs = [];
 
         $data = $payments->where('id', $id)[0];
@@ -732,6 +733,7 @@ class Payments extends Controller
                 'errors' => $errors,
                 'rows' => $data,
                 'hiddenSearch' => $hiddenSearch,
+                'banks' => $banks->where('status', 1),
                 'crumbs' => $crumbs,
                 'actives' => $actives
             ]);
@@ -891,6 +893,7 @@ class Payments extends Controller
         $payments = new Payment();
         $coust = new Customer();
         $tithe = new Tithe();
+        $banks = new Bank();
 
         $rows = array();
 
@@ -951,6 +954,7 @@ class Payments extends Controller
                 'errors' => $errors,
                 'crumbs' => $crumbs,
                 'rows' => $row,
+                'banks' => $banks->where('status', 1),
                 'cust' => $rows,
                 'totals' => $totals,
                 'hiddenSearch' => $hiddenSearch,

@@ -42,10 +42,10 @@ class Payment extends Model
         if (empty($data['amount']) && array_key_exists('ret', $data)) {
             $this->errors['amount'] = "Enter amount";
         }
-        
-        if ($this->query("SELECT * FROM `payments` WHERE `transid` = '".$data['transid']."' AND `datepaid` = CURRENT_DATE AND `modeofpayment` = '".$data['modeofpayment']."'")) {
+
+        if ($this->query("SELECT * FROM `payments` WHERE `transid` = '" . $data['transid'] . "' AND `datepaid` = CURRENT_DATE AND `modeofpayment` = '" . $data['modeofpayment'] . "'")) {
             $this->errors['transid'] = "Transaction number used already";
-        }        
+        }
 
         //check if the errors are empty
         if (count($this->errors) == 0) {
@@ -183,7 +183,7 @@ class Payment extends Model
         $payment = new Payment();
         if ($data) {
             foreach ($data as $key => $row) {
-                $offid  = $row->id;                
+                $offid  = $row->id;
                 if (count($payArr) != 0) {
                     $query = "SELECT SUM(`amount`) AS totalpayed, customers.custtype FROM `payments` LEFT JOIN customers ON payments.customerid = customers.id WHERE payments.`officerid`= $offid AND customers.custtype = 'school' AND payments.`seasonid` = {$seasid} AND (paymentdate >= :startDate AND paymentdate <= :endDate)";
                 } else {
@@ -208,6 +208,7 @@ class Payment extends Model
         }
         return $data;
     }
+
 
     public function get_TotalSales($useid)
     {

@@ -84,7 +84,7 @@ class Setups extends Controller
             $acti->query($query, $_POST);
         }
 
-        $data = $acti->findAll($limit, offset: $offset, rotations:"DESC");
+        $data = $acti->findAll($limit, offset: $offset, rotations: "DESC");
 
         //this are for breadcrumb
         $crumbs[] = ['Dashboard', 'dashboard'];
@@ -164,6 +164,78 @@ class Setups extends Controller
         $hiddenSearch = "yeap";
         if (Auth::access('director')) {
             return $this->view('setups.ordertype', [
+                'errors' => $errors,
+                'crumbs' => $crumbs,
+                'hiddenSearch' => $hiddenSearch,
+                'rows' => $data,
+                'actives' => $actives
+            ]);
+        } else {
+            $crumbs[] = ['Access Denied', ''];
+            return $this->view('access-denied', [
+                'crumbs' => $crumbs,
+                'actives' => $actives
+            ]);
+        }
+    }
+
+    public function banks()
+    {
+        if (!Auth::logged_in()) {
+            return $this->redirect('login');
+        }
+        $errors = array();
+        $banks = new Bank();
+        $payments = new Payment();
+        if (count($_POST) > 0 && Auth::access('director')) {
+
+            if (isset($_POST['activs'])) {
+                $dd['status'] = '1';
+                $banks->update($_POST['activs'], $dd);
+                $_SESSION['messsage'] = "Bank Updated Successfully";
+                $_SESSION['status_code'] = "success";
+                $_SESSION['status_headen'] = "Good job!";
+            } else
+            if (isset($_POST['block'])) {
+                $dd['status'] = '0';
+                $banks->update($_POST['block'], $dd);
+                $_SESSION['messsage'] = "Bank Blocked Successfully";
+                $_SESSION['status_code'] = "success";
+                $_SESSION['status_headen'] = "Good job!";
+            } else
+            if (isset($_POST['dels'])) {
+                $banks->delete($_POST['dels']);
+                $ids = $_POST['dels'];
+                $query = "DELETE FROM `payment` WHERE `modeofpayment` ='$ids'";
+                $payments->query($query);
+                $_SESSION['messsage'] = "Bank Deleted Successfully";
+                $_SESSION['status_code'] = "success";
+                $_SESSION['status_headen'] = "Good job!";
+            } else
+            if ($banks->validate($_POST)) {
+                $banks->insert($_POST);
+                $_SESSION['messsage'] = "Bank Added Successfully";
+                $_SESSION['status_code'] = "success";
+                $_SESSION['status_headen'] = "Good job!";
+            } else {
+                $errors = $banks->errors;
+                $_SESSION['messsage'] = "Operation Not Successfull";
+                $_SESSION['status_code'] = "error";
+                $_SESSION['status_headen'] = "OOP's!";
+            }
+            return $this->redirect('setups/banks');
+        }
+
+        $data = $banks->findAll();
+
+        //this are for breadcrumb
+        $crumbs[] = ['Dashboard', 'dashboard'];
+        $crumbs[] = ['Setup', 'setup'];
+        $crumbs[] = ['Banks', ''];
+        $actives = 'setup';
+        $hiddenSearch = "yeap";
+        if (Auth::access('director')) {
+            return $this->view('setups.banks', [
                 'errors' => $errors,
                 'crumbs' => $crumbs,
                 'hiddenSearch' => $hiddenSearch,

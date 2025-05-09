@@ -76,15 +76,15 @@
                                                 <?= ucfirst(esc($row->custlocation) . " (" . esc($row->region) . ")") ?>
                                             </td>
                                             <td>
-                                                <?php 
-                                                    if(isset($row->marketer->firstname)){
-                                                        echo esc($row->marketer->firstname);  
-                                                    }
-                                                    
-                                                    if(isset($row->marketer->lastname)){
-                                                        echo esc($row->marketer->lastname);
-                                                    }                                                
-                                                ?> 
+                                                <?php
+                                                if (isset($row->marketer->firstname)) {
+                                                    echo esc($row->marketer->firstname);
+                                                }
+
+                                                if (isset($row->marketer->lastname)) {
+                                                    echo esc($row->marketer->lastname);
+                                                }
+                                                ?>
                                             </td>
                                             <td>
                                                 <?= esc($row->workbook) ?>
@@ -93,7 +93,8 @@
                                                 <?= esc($row->textbook) ?>
                                             </td>
                                             <td>
-                                                <?php // if (($row->officerid == Auth::getId()) && ($row->dateadded == date("Y-m-d", strtotime(date("Y-m-d")."-1 day")))) : ?>
+                                                <?php // if (($row->officerid == Auth::getId()) && ($row->dateadded == date("Y-m-d", strtotime(date("Y-m-d")."-1 day")))) : 
+                                                ?>
                                                 <?php if (($row->officerid == Auth::getId()) || ($row->withother == Auth::getId())) : ?>
                                                     <a href="<?= HOME ?>/customers/visitededit/<?= $row->id ?>">
                                                         <i class="m-2 mdi mdi-table-edit"> </i>Top up
@@ -101,13 +102,13 @@
                                                 <?php endif; ?>
                                             </td>
                                             <td>
-                                                <?php if($row->donedata != 1 && Auth::getRank()== 'marketer'):?>                                               
+                                                <?php if ($row->donedata != 1 && Auth::getRank() == 'marketer'): ?>
                                                     <form action="" method="post">
                                                         <button name="movetocustomer" value="<?= $row->id ?>" class="btn-ssm btn-success">
                                                             Move
                                                         </button>
                                                     </form>
-                                                <?php endif;?>
+                                                <?php endif; ?>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -121,11 +122,11 @@
                             </tbody>
                         </table>
                     </div>
-                    <?php if (Auth::access('stores')):?>
-                    <form method="Post">
-                        <button name="exportexl" class="btn btn-success">Export to Excel</button>
-                    </form>
-                    <?php endif;?>
+                    <?php if (Auth::access('stores')): ?>
+                        <form method="Post">
+                            <button name="exportexl" class="btn btn-success">Export to Excel</button>
+                        </form>
+                    <?php endif; ?>
                 </div>
                 <?php $pager->display($rows ? count($rows) : 0); ?>
             </div>

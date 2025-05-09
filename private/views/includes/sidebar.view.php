@@ -185,6 +185,7 @@
                      <ul class="nav flex-column sub-menu">
                          <li class="nav-item"> <a class="nav-link" href="<?= HOME ?>/setups/season"> Seasons </a></li>
                          <li class="nav-item"> <a class="nav-link" href="<?= HOME ?>/setups/ordertype"> Order Type </a></li>
+                         <li class="nav-item"> <a class="nav-link" href="<?= HOME ?>/setups/banks"> Banks </a></li>
                      </ul>
                  </div>
              </li>

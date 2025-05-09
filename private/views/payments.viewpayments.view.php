@@ -31,13 +31,12 @@
                                     <div class="col">
                                         <label>Mode</label>
                                         <select name="modeofpayment" id="modeofpayment" class="form-control" required>
-                                            <option value=""> -- Payment Mode --</option>
-                                            <option value="UBA">UBA</option>
-                                            <option value="FIDELITY">FIDELITY</option>
-                                            <option value="CBG">CBG</option>
-                                            <option value="NIB">NIB</option>
-                                            <option value="MOMO">MOMO</option>
-                                            <option value="WHT">WHT</option>
+                                            <option value=""> -- Payment Mode / Bank --</option>
+                                            <?php if ($banks): ?>
+                                                <?php foreach ($banks as $bank) : ?>
+                                                    <option value="<?= $bank->abrv ?>"><?= $bank->abrv ?></option>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
                                         </select>
                                     </div>
                                     <div class="col">

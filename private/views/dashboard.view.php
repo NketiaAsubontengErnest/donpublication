@@ -193,63 +193,85 @@
             </div>
         </div>
         <form id="seasonForm" action="" method="post">
-            <div class="container">
+            <div class="">
                 <div class="row">
-                    <?php 
+                    <?php
                     $countses = 0;
                     foreach ($season as $seas): ?>
-                        <?php if($seas->id != $_SESSION['seasondata']->id):
-                            $countses ++;
-                            ?>
+                        <?php if ($seas->id != $_SESSION['seasondata']->id):
+                            $countses++;
+                        ?>
 
-                            <div class="col-md-3 mb-4 stretch-card transparent">
-                            <button type="button" class="card card-light-blue w-100" onclick="confirmSubmission('<?= esc($seas->id) ?>', '<?= esc($seas->SeasonName) ?>')">
-                                <div class="card-body" style="text-align: left;">
-                                    <div class="row">
-                                        <p class="fs-30 mb-4"><?= esc($seas->SeasonName) ?></p>
-                                        <div class="col-md-6">
-                                            <p class="mb-4"><b>Gross Sales:</b></p>
-                                            <p class="mb-4"><b>Net Sales:</b></p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <p class="mb-4"><b>Balance:</b></p>
-                                            <p class="mb-4"><b>Status:</b> <?= esc($seas->SeasonStatus) ?></p>
+                            <div class="col-md-3 mb-2 stretch-card transparent">
+                                <button type="button" class="card card-light-blue w-100"
+                                    onclick="confirmSubmission('<?= esc($seas->id) ?>', '<?= esc($seas->SeasonName) ?>')">
+                                    <div class="card-body" style="text-align: left;">
+                                        <div class="row">
+                                            <p class="fs-30 mb-2"><?= esc($seas->SeasonName) ?></p>
+
+                                            <?php
+                                            $recovery = 0;
+                                            $returns = 0;
+                                            $netamt = 0;
+
+                                            try {
+                                                $netamt = $seas->OfficTotalDept->totaldept - $seas->OfficTotalDept->totaldisc;
+                                            } catch (\Throwable $th) {
+                                                // Handle exception or leave blank
+                                            }
+
+                                            try {
+                                                $returns = ($seas->OfficTotalDept->total_net_returns /
+                                                    ($seas->OfficTotalDept->total_net_returns + $netamt)) * 100;
+                                            } catch (\Throwable $th) {
+                                                // Handle exception or leave blank
+                                            }
+                                            ?>
+
+                                            <div class="col-md-6">
+                                                <p class="mb-2"><b>Gross Sales:</b> <?= esc(number_format($seas->OfficTotalDept->totaldept, 2)) ?></p>
+                                                <p class="mb-2"><b>Net Sales:</b> <?= esc(number_format($netamt, 2)) ?></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p class="mb-2"><b>Balance:</b> <?= esc(number_format($netamt - $seas->OfficTotal->totalpayed, 2)) ?></p>
+                                                <p class="mb-2"><b>Status:</b> <?= esc($seas->SeasonStatus) ?></p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </button>
-                        </div>
-                        <?php endif?>
+                                </button>
+                            </div>
+
+                        <?php endif ?>
                     <?php endforeach; ?>
-                    <?php if($countses == 0):?>
+                    <?php if ($countses == 0): ?>
                         <p>there is no order season</p>
-                    <?php endif?>
+                    <?php endif ?>
                 </div> <!-- End row -->
             </div>
             <input type="hidden" id="selectedSeason" name="season" value=""> <!-- Hidden input to hold the selected season -->
         </form>
-       
+
         <script src="<?= ASSETS ?>/js/flush_arlert1.js"></script>
-  <script>
-      // Function to show SweetAlert confirmation
-      function confirmSubmission(seasonId, seasonName) {
-          Swal.fire({
-              title: 'Switch Season',
-              text: "Do you want to switch the season to '" + seasonName + "'?",
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
-              confirmButtonText: 'Yes',
-              cancelButtonText: 'No'
-          }).then((result) => {
-              if (result.isConfirmed) {
-                  // If the user clicks "Yes", submit the form
-                  document.getElementById('selectedSeason').value = seasonId;
-                  document.getElementById('seasonForm').submit();
-              }
-          });
-      }
-  </script>
+        <script>
+            // Function to show SweetAlert confirmation
+            function confirmSubmission(seasonId, seasonName) {
+                Swal.fire({
+                    title: 'Switch Season',
+                    text: "Do you want to switch the season to '" + seasonName + "'?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // If the user clicks "Yes", submit the form
+                        document.getElementById('selectedSeason').value = seasonId;
+                        document.getElementById('seasonForm').submit();
+                    }
+                });
+            }
+        </script>
 
         <?php $this->view('includes/footer'/*, ['crumbs'=>$crumbs, 'actives'=>$actives]*/) ?>

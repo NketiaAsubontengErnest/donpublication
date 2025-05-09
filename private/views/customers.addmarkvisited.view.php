@@ -5,13 +5,14 @@
         <div class="col-md-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <p class="card-title mb-0">Breakdown of officer supply</p>
+                    <p class="card-title mb-0">Breakdown of officer supply for <?= $maketer ?></p>
                     <div class="table-responsive">
                         <table class="table table-striped table-borderless">
                             <thead>
                                 <tr>
                                     <th>Book</th>
                                     <th>Qty Supplied</th>
+                                    <th>Actual Supplied</th>
                                     <th>Sample Qty</th>
                                     <th>Qty Returned</th>
                                     <th>Sample Returned</th>
@@ -22,7 +23,8 @@
                                     <?php foreach ($rows as $row): ?>
                                         <tr>
                                             <td><?= esc($row->level->class . ' ' . $row->subject->subject . ' ' . $row->booktype->booktype) ?></td>
-                                            <td class="font-weight-medium"><?= esc(number_format($row->ttMarketSupply->ttMarketSupply)) ?></td>
+                                            <td class="font-weight-medium"><?= esc(number_format($row->ttMarketSupply->ttSupply)) ?></td>
+                                            <td class="font-weight-medium"><?= esc(number_format($row->ttMarketSupply->actualSupply)) ?></td>
 
                                             <td class="font-weight-medium"><?= esc(number_format($row->ttMarkSampleSupply->ttMarkSampleSupply)) ?></td>
                                             <td class="font-weight-medium">
@@ -37,7 +39,7 @@
                             </tbody>
                         </table>
                     </div>
-                    
+
                     <form method="Post">
                         <button name="exportexl" class="btn btn-success">Export to Excel</button>
                     </form>

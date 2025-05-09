@@ -29,7 +29,7 @@ class Visitor extends Model
     ];
     public function validate($data)
     {
-        $this->errors = array();
+        $this->errors['errors'] = "";
         if (isset($data['oldcustomer'])) {
             if (!empty($data['oldcustomer']) && empty($data['customername'])) {
                 $data['customername'] = $data['oldcustomer'];
@@ -37,39 +37,39 @@ class Visitor extends Model
             } elseif (empty($data['oldcustomer']) && !empty($data['customername'])) {
                 unset($data['oldcustomer']);
             } else {
-                $this->errors['allset'] = "you can't set Old and New Customer";
+                $this->errors['errors'] .= ", you can't set Old and New Customer";
             }
         }
         //checking errors for customer name
         if (empty($data['customername']) || !preg_match('/^[a-zA-Z 0-9&\-\.]+$/', $data['customername'])) {
-            $this->errors['customername'] = "Only letters allowed in customer name";
+            $this->errors['errors'] .= ", Only letters allowed in customer name";
         }
         //checking errors for customer location      
         if (empty($data['custlocation'])) {
-            $this->errors['custlocation'] = "Customer location can't be empty";
+            $this->errors['errors'] .= ", Customer location can't be empty";
         }
         //checking errors for customer location      
         if (empty($data['contactperson'])) {
-            $this->errors['contactperson'] = "Contact person can't be empty";
+            $this->errors['errors'] .= ", Contact person can't be empty";
         }
 
         //checking errors for customer location      
         if (strlen($data['custphone']) != 10) {
-            $this->errors['custphone'] = "Customer phone can't be less or more than 10";
+            $this->errors['errors'] .= ", Customer phone can't be less or more than 10";
         }
 
-        if ($this->where('custphone', $data['custphone'])) {
-            $this->errors['custphone'] = "Customer alrady exists";
+        if ($this->query("SELECT * FROM visitors WHERE custphone = {$data['custphone']} AND seasonid = {$data['seasonid']}")) {
+            $this->errors['errors'] .= ", Customer already exists in this season";
         }
 
         //checking errors for customer type
         if (empty($data['region'])) {
-            $this->errors['region'] = "Select customer region";
+            $this->errors['errors'] .= ", Select customer region";
         }
 
 
         //check if the errors are empty
-        if (count($this->errors) == 0) {
+        if ($this->errors['errors'] == "") {
             return true;
         }
         return false;

@@ -11,7 +11,7 @@
                     <form action="" method="post" id="items_form">
                         <div class="row">
                             <div class="form-group col-lg-6">
-                                <select name="customerid" class="form-control form-control-lg" id="select_box" required>
+                                <select name="customerid" class="form-control form-control-lg" id="customerid" required>
                                     <option value="">-- Customer --</option>
                                     <?php if ($rowc) : ?>
                                         <?php foreach ($rowc as $row) : ?>

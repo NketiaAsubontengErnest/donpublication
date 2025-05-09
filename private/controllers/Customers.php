@@ -154,7 +154,7 @@ class Customers extends Controller
             $query = "SELECT * FROM `visitors` WHERE (`customername` LIKE :search OR `custphone` LIKE :search) AND `seasonid` = $seasid LIMIT $limit OFFSET $offset";
             $data = $visitors->query($query, $arr);
         } else {
-            $query = "SELECT * FROM `visitors` WHERE `seasonid` =$seasid";
+            $query = "SELECT * FROM `visitors` WHERE `seasonid` = $seasid";
             $data1 = $visitors->query($query);
             if (Auth::access('marketer')) {
                 $arr['useris'] = Auth::getID();
@@ -297,7 +297,7 @@ class Customers extends Controller
 
         $errors = array();
         if (count($_POST) > 0) {
-            $_POST['seasonid'] = isset($datas['season']->id) ? $datas['season']->id : '';
+            $_POST['seasonid'] = isset($season->selctingLastId()[0]->id) ? $season->selctingLastId()[0]->id : '';
             $_POST['officerid'] = Auth::getId();
 
             if ($visitors->validate($_POST)) {
@@ -308,7 +308,7 @@ class Customers extends Controller
                 return $this->redirect('customers/visited');
             } else {
                 $errors = $visitors->errors;
-                $_SESSION['messsage'] = $errors;
+                $_SESSION['messsage'] = trim($errors['errors'], ', ');
                 $_SESSION['status_code'] = "error";
                 $_SESSION['status_headen'] = "Opps!";
             }
@@ -426,11 +426,11 @@ class Customers extends Controller
             $data1 = $books->get_Makerter_Supply($data1, $id);
             $data1 = $books->get_Makerter_Returns($data1, $id);
 
-            $fields = array('Book', 'Qty Supplied', 'Sample Qty', 'Qty Returned', 'Sample Ret', 'Total Supply', 'Total sample', 'Total Gross', 'Total Net');
+            $fields = array('Book', 'Qty Supplied', 'Sample Qty', 'Qty Returned', 'Sample Ret', 'Total Supply', 'Total sample', 'Total Gross', 'Net Return', 'Total Net');
             $excelData = implode("\t", array_values($fields)) . "\n";
             if ($data1) {
                 foreach ($data1 as $row) {
-                    $lineData = array(esc($row->level->class . ' ' . $row->subject->subject . ' ' . $row->booktype->booktype), esc(number_format($row->ttMarketSupply->ttMarketSupply)), esc(number_format($row->ttMarkSampleSupply->ttMarkSampleSupply)), esc(number_format($row->ttmarketreturns->ttmarketreturns)), esc(number_format($row->ttmarketreturns->retsample)), esc(number_format($row->ttMarketSupply->ttMarketSupply - $row->ttmarketreturns->ttmarketreturns)), esc(number_format($row->ttMarkSampleSupply->ttMarkSampleSupply - $row->ttmarketreturns->retsample)), esc(number_format($row->ttMarketSupply->book_gross)), esc(number_format($row->ttMarketSupply->book_net)));
+                    $lineData = array(esc($row->level->class . ' ' . $row->subject->subject . ' ' . $row->booktype->booktype), esc(number_format($row->ttMarketSupply->ttSupply)), esc(number_format($row->ttMarkSampleSupply->ttMarkSampleSupply)), esc(number_format($row->ttmarketreturns->ttmarketreturns)), esc(number_format($row->ttmarketreturns->retsample)), esc(number_format($row->ttMarketSupply->actualSupply)), esc(number_format($row->ttMarkSampleSupply->ttMarkSampleSupply - $row->ttmarketreturns->retsample)), esc(number_format($row->ttMarketSupply->book_gross, 2)), esc(number_format($row->ttMarketSupply->return_net, 2)), esc(number_format($row->ttMarketSupply->book_net, 2)));
                     $excelData .= implode("\t", array_values($lineData)) . "\n";
                 }
                 export_data_to_excel($fields, $excelData, $use . '_Individual_Books_Report');
@@ -452,6 +452,7 @@ class Customers extends Controller
             'hiddenSearch' => $hiddenSearch,
             'pager' => $pager,
             'rows' => $row,
+            'maketer' => $use,
             'actives' => $actives
         ]);
     }
