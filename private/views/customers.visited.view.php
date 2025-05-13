@@ -131,6 +131,69 @@
                 <?php $pager->display($rows ? count($rows) : 0); ?>
             </div>
         </div>
+        <?php if ($alldata) : ?>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row m-2">
+                        <h4 class="card-title"> General Search (+ Original Customers)</h4>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Customer Name
+                                    </th>
+                                    <th>
+                                        Phone Number
+                                    </th>
+                                    <th>
+                                        Location
+                                    </th>
+                                    <th>
+                                        Marketer
+                                    </th>
+                                    <th>
+                                        Status
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <?php foreach ($alldata as $row) : ?>
+                                    <tr>
+                                        <td>
+                                            <?= esc($row->customername) ?>
+                                        </td>
+                                        <td>
+                                            <?= ucfirst(esc($row->custphone)) ?>
+                                        </td>
+                                        <td>
+                                            <?= ucfirst(esc($row->custlocation) . " (" . esc($row->region) . ")") ?>
+                                        </td>
+                                        <td>
+                                            <?php
+                                            if (isset($row->marketer->firstname)) {
+                                                echo esc($row->marketer->firstname);
+                                            }
+
+                                            if (isset($row->marketer->lastname)) {
+                                                echo esc($row->marketer->lastname);
+                                            }
+                                            ?>
+                                        </td>
+                                        <td>
+                                            <?= ucfirst(esc($row->status)) ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
 
 

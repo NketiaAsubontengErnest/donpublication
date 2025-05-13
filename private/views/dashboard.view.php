@@ -166,7 +166,7 @@
                                 <p class="fs-30 mb-5"><?= esc(number_format($rows['ttcusts']->ttcust)) ?></p>
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <p class="fs-25 "><?= esc(number_format($rows['ttcustsv']->ttcustv)) ?> Visited</p>
+                                        <p class="fs-25 "><?= esc(number_format($rows['ttcustsv'])) ?> Visited</p>
                                     </div>
                                     <div class="col-md-6">
                                         <p></p>

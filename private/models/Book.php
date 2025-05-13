@@ -204,9 +204,8 @@ class Book extends Model
       foreach ($data as $key => $row) {
          $seas = new Season();
          //get current Season
-         $seasid = isset($seas->selctingLastId()[0]->id) ? $seas->selctingLastId()[0]->id : '';
          $arr['bookid'] = $row->id;
-         $arr['seasonid'] = $seasid;
+         $arr['seasonid'] = $_SESSION['seasondata']->id ?? '';
          $arr['customerid'] = $id;
 
          $query = "SELECT SUM(quantord) AS grosquant, SUM(retverquant) AS ret_quant FROM `orders` WHERE `bookid`=:bookid AND `seasonid` =:seasonid AND `ordertype` != 1 AND `customerid`=:customerid";

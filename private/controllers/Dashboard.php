@@ -85,9 +85,6 @@ class Dashboard extends Controller
         $bbb = $books->query($querysup, $arr)[0];
         $data['order'] = isset($bbb) ? $bbb : '';
 
-        show($ss2);
-        die;
-
         $msg = " Logged in successfully";
         $crumbs[] = ['Dashboard', ''];
         $actives = 'dashboard';

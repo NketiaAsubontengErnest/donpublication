@@ -43,7 +43,7 @@ class Payment extends Model
             $this->errors['amount'] = "Enter amount";
         }
 
-        if ($this->query("SELECT * FROM `payments` WHERE `transid` = '" . $data['transid'] . "' AND `datepaid` = CURRENT_DATE AND `modeofpayment` = '" . $data['modeofpayment'] . "'")) {
+        if ($this->query("SELECT * FROM `payments` WHERE `transid` = '" . $data['transid'] . "' AND `datepaid` = CURRENT_DATE AND `modeofpayment` = '" . $data['modeofpayment'] . "' AND `seasonid` = '" . $_SESSION['seasondata']->id ?? '' . "'")) {
             $this->errors['transid'] = "Transaction number used already";
         }
 
@@ -148,7 +148,8 @@ class Payment extends Model
     {
         $payme = new Payment();
         $arr['custid'] = $id;
-        $query = "SELECT SUM(`amount`) AS totalpayed FROM `payments` WHERE `customerid` =:custid ";
+        $arr['seasonid'] = $_SESSION['seasondata']->id ?? '';
+        $query = "SELECT SUM(`amount`) AS totalpayed FROM `payments` WHERE `customerid` =:custid AND `seasonid` =:seasonid";
         $result = $payme->query($query, $arr);
         return is_array($result) ? $result[0] : array();;
     }
@@ -156,9 +157,10 @@ class Payment extends Model
     public function get_OfficTotal($data)
     {
         $payment = new Payment();
+        $arr['seasonid'] = $_SESSION['seasondata']->id ?? '';
         if ($data) {
             foreach ($data as $key => $row) {
-                $query = "SELECT SUM(`amount`) AS totalpayed FROM `payments` WHERE `ordertype` != '1' AND `officerid` = $row->id";
+                $query = "SELECT SUM(`amount`) AS totalpayed FROM `payments` WHERE `ordertype` != '1' AND `officerid` = $row->id AND `seasonid` = {$arr['seasonid']}";
                 $result = $payment->query($query);
                 $data[$key]->OfficTotal = is_array($result) ? $result[0] : array();
             }
@@ -168,9 +170,10 @@ class Payment extends Model
     public function get_OfficTotalDept($data)
     {
         $order = new Order();
+        $arr['seasonid'] = $_SESSION['seasondata']->id ?? '';
         if ($data) {
             foreach ($data as $key => $row) {
-                $query = "SELECT SUM((`quantsupp` - `retverquant`) * `unitprice`) AS totaldept, SUM((`retverquant` * `unitprice`)* ((100 - `discount`)/100)) AS total_net_returns, SUM(`retverquant` * `unitprice`) AS totalReturns, SUM(((`quantsupp` - `retverquant`) * `unitprice`)* (`discount`/100)) AS totaldisc FROM `orders` WHERE `ordertype` != '1' AND `officerid` = $row->id";
+                $query = "SELECT SUM((`quantsupp` - `retverquant`) * `unitprice`) AS totaldept, SUM((`retverquant` * `unitprice`)* ((100 - `discount`)/100)) AS total_net_returns, SUM(`retverquant` * `unitprice`) AS totalReturns, SUM(((`quantsupp` - `retverquant`) * `unitprice`)* (`discount`/100)) AS totaldisc FROM `orders` WHERE `ordertype` != '1' AND `officerid` = $row->id AND `seasonid` = {$arr['seasonid']}";
                 $result = $order->query($query);
                 $data[$key]->OfficTotalDept = is_array($result) ? $result[0] : array();
             }

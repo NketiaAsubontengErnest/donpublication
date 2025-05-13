@@ -94,6 +94,7 @@ class Customers extends Controller
         $customer = new Customer();
         $errors = array();
         $newcus = array();
+        $alldata = array();
 
         $visitors = new Visitor();
 
@@ -153,6 +154,11 @@ class Customers extends Controller
             $arr['search'] = $searching;
             $query = "SELECT * FROM `visitors` WHERE (`customername` LIKE :search OR `custphone` LIKE :search) AND `seasonid` = $seasid LIMIT $limit OFFSET $offset";
             $data = $visitors->query($query, $arr);
+
+            $query1 = "SELECT `officerid`, `customername`, `custphone`, `custlocation`, `region`, 'Customer' AS `status` FROM customers WHERE `customername` LIKE :search OR `custphone` LIKE :search UNION SELECT `officerid`, `customername`, `custphone`, `custlocation`, `region`, 'Visited' AS `status` FROM visitors WHERE (`customername` LIKE :search OR `custphone` LIKE :search) AND `seasonid` = $seasid; ";
+            $alldata = $visitors->query($query1, $arr);
+
+            $alldata = $visitors->get_Officer($alldata);
         } else {
             $query = "SELECT * FROM `visitors` WHERE `seasonid` = $seasid";
             $data1 = $visitors->query($query);
@@ -167,6 +173,8 @@ class Customers extends Controller
                 $query = "SELECT * FROM `visitors` WHERE `seasonid` = $seasid LIMIT $limit OFFSET $offset";
                 $data = $visitors->query($query);
             }
+
+            $alldata = array();
         }
 
         $data = $visitors->get_Officer($data);
@@ -178,6 +186,7 @@ class Customers extends Controller
         $hiddenSearch = "";
         return $this->view('customers.visited', [
             'rows' => $data,
+            'alldata' => $alldata,
             'crumbs' => $crumbs,
             'pager' => $pager,
             'hiddenSearch' => $hiddenSearch,
