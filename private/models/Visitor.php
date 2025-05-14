@@ -18,6 +18,7 @@ class Visitor extends Model
         'textbook',
         'officerid',
         'seasonid',
+        'visittype',
     ];
 
     protected $beforeInset = [

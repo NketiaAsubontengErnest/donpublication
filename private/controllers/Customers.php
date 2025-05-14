@@ -194,6 +194,136 @@ class Customers extends Controller
         ]);
     }
 
+    function smssending($id = null)
+    {
+        if (!Auth::logged_in()) {
+            return $this->redirect('login');
+        }
+
+        // Setting pagination
+        $limit = 15;
+        $pager = new Pager($limit);
+        $offset = $pager->offset;
+
+        $customer = new Customer();
+        $alldata = array();
+
+        $data = array();
+        $phoneNumbers = [];
+        $phoneNumbersString = "";
+
+        $visitors = new Visitor();
+
+        $seasid = $_SESSION['seasondata'] != null ? $_SESSION['seasondata']->id : "";
+
+
+        if (isset($_GET['fetchNumbers'])) {
+
+            $tableName = $_GET['tableName'];
+            $dateFrom = $_GET['dateFrom'];
+            $dateTo = $_GET['dateTo'];
+
+            if ($tableName == 'visitors') {
+                $data = $visitors->query("SELECT custphone FROM $tableName WHERE dateadded BETWEEN :dateFrom AND :dateTo", [
+                    'dateFrom' => $dateFrom,
+                    'dateTo' => $dateTo
+                ]);
+            } else if ($tableName == 'customers') {
+                $data = $customer->query("SELECT custphone FROM $tableName");
+            }
+
+            $phoneNumbers = [];
+
+            if (!is_array($data)) {
+                $data = [];
+            }
+
+            foreach ($data as $row) {
+                if (strlen($row->custphone) == 10) {
+                    $phoneNumbers[] = $row->custphone;
+                }
+            }
+
+            $phoneNumbersString = implode(', ', $phoneNumbers);
+        } else {
+            $data = $visitors->query("SELECT custphone FROM visitors WHERE dateadded =:dateFrom", [
+                'dateFrom' => date('Y-m-d'),
+            ]);
+
+            if (!is_array($data)) {
+                $data = [];
+            }
+            foreach ($data as $row) {
+                if (strlen($row->custphone) == 10) {
+                    $phoneNumbers[] = $row->custphone;
+                }
+            }
+
+            $phoneNumbersString = implode(', ', $phoneNumbers);
+        }
+
+        if (isset($_POST['sendSMS'])) {
+            $message = $_POST['message'];
+            $phoneNumbers = $_POST['phoneNumbers'];
+
+            // Send SMS logic here
+            // You can use an SMS gateway API to send the message to the phone numbers
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://devapi.fayasms.com/messages',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => json_encode([
+                    "sender" => "DON SERIES",
+                    "message" => $message,
+                    "recipients" => $phoneNumbers,
+                ]),
+                CURLOPT_HTTPHEADER => array(
+                    'fayasms-developer: app_key.app_secret',
+                    'Content-Type: application/json'
+                ),
+            ));
+
+            $response = curl_exec($curl);
+
+            if (curl_errno($curl)) {
+                $_SESSION['messsage'] = "SMS sending failed: " . curl_error($curl);
+                $_SESSION['status_code'] = "error";
+                $_SESSION['status_headen'] = "Oops!";
+            } else {
+                $_SESSION['messsage'] = "SMS sent successfully!";
+                $_SESSION['status_code'] = "success";
+                $_SESSION['status_headen'] = "Good job!";
+            }
+
+            curl_close($curl);
+
+            $_SESSION['messsage'] = "SMS sent successfully!";
+            $_SESSION['status_code'] = "success";
+            $_SESSION['status_headen'] = "Good job!";
+        }
+
+
+        //this are for breadcrumb
+        $crumbs[] = ['Dashboard', 'dashboard'];
+        $crumbs[] = ['Customers', ''];
+        $actives = 'marketers';
+        $hiddenSearch = "";
+        return $this->view('customers.smssending', [
+            'crumbs' => $crumbs,
+            'pager' => $pager,
+            'phoneNumbersString' => $phoneNumbersString,
+            'hiddenSearch' => $hiddenSearch,
+            'actives' => $actives
+        ]);
+    }
+
     public function add()
     {
         if (!Auth::logged_in()) {
@@ -277,10 +407,68 @@ class Customers extends Controller
         $crumbs[] = ['Customers', 'Customers'];
         $crumbs[] = ['Visisters', ''];
 
-        $actives = 'customers';
+        $actives = 'smpcustomers';
         $hiddenSearch = "";
 
         return $this->view('customers.visitededit', [
+            'errors' => $errors,
+            'crumbs' => $crumbs,
+            'row' => $data,
+            'hiddenSearch' => $hiddenSearch,
+            'actives' => $actives
+        ]);
+    }
+
+    public function visitedit($id = '')
+    {
+        if (!Auth::logged_in()) {
+            return $this->redirect('login');
+        }
+
+        $data = array();
+        $visitors = new Visitor();
+        $errors = array();
+        if (count($_POST) > 0) {
+            if ($_POST['textbook'] != '') {
+                $_POST['textbook'] = $_POST['textbook'];
+            } else {
+                $_POST['textbook'] = $_POST['oldtextbook'];
+            }
+            if ($_POST['workbook'] != '') {
+                $_POST['workbook'] = $_POST['workbook'];
+            } else {
+                $_POST['workbook'] = $_POST['oldworkbook'];
+            }
+            unset($_POST['oldworkbook']);
+            unset($_POST['oldtextbook']);
+
+            $visitors->update($id, $_POST);
+            $_SESSION['messsage'] = "Visitor Edited Successfully";
+            $_SESSION['status_code'] = "success";
+            $_SESSION['status_headen'] = "Good job!";
+
+            return $this->redirect('customers/visited');
+        } else {
+            $errors = $visitors->errors;
+            $_SESSION['messsage'] = $errors;
+            $_SESSION['status_code'] = "error";
+            $_SESSION['status_headen'] = "Opps!";
+        }
+
+        $data = [];
+        if ($id) {
+            $data = $visitors->where('id', $id)[0];
+        }
+
+        //this are for breadcrumb
+        $crumbs[] = ['Dashboard', 'dashboard'];
+        $crumbs[] = ['Customers', 'Customers'];
+        $crumbs[] = ['Visisters', ''];
+
+        $actives = 'smpcustomers';
+        $hiddenSearch = "";
+
+        return $this->view('customers.visitedit', [
             'errors' => $errors,
             'crumbs' => $crumbs,
             'row' => $data,

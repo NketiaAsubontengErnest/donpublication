@@ -96,9 +96,20 @@
                                                 <?php // if (($row->officerid == Auth::getId()) && ($row->dateadded == date("Y-m-d", strtotime(date("Y-m-d")."-1 day")))) : 
                                                 ?>
                                                 <?php if (($row->officerid == Auth::getId()) || ($row->withother == Auth::getId())) : ?>
-                                                    <a href="<?= HOME ?>/customers/visitededit/<?= $row->id ?>">
-                                                        <i class="m-2 mdi mdi-table-edit"> </i>Top up
-                                                    </a>
+                                                    <?php
+                                                    $today = date('Y-m-d');
+                                                    $dateAdded = date('Y-m-d', strtotime($row->dateadded));
+                                                    ?>
+
+                                                    <?php if ($dateAdded === $today): ?>
+                                                        <a href="<?= HOME ?>/customers/visitedit/<?= $row->id ?>">
+                                                            <i class="m-2 mdi mdi-table-edit"> </i>Edit
+                                                        </a>
+                                                    <?php else: ?>
+                                                        <a href="<?= HOME ?>/customers/visitededit/<?= $row->id ?>">
+                                                            <i class="m-2 mdi mdi-table-edit"> </i>Top up
+                                                        </a>
+                                                    <?php endif; ?>
                                                 <?php endif; ?>
                                             </td>
                                             <td>
@@ -126,6 +137,9 @@
                         <form method="Post">
                             <button name="exportexl" class="btn btn-success">Export to Excel</button>
                         </form>
+                    <?php endif; ?>
+                    <?php if (Auth::access('director')): ?>
+                        <a href="<?= HOME ?>/customers/smssending" class="float-end">Send SMS</a>
                     <?php endif; ?>
                 </div>
                 <?php $pager->display($rows ? count($rows) : 0); ?>

@@ -43,7 +43,7 @@ class Payment extends Model
             $this->errors['amount'] = "Enter amount";
         }
 
-        if ($this->query("SELECT * FROM `payments` WHERE `transid` = '" . $data['transid'] . "' AND `datepaid` = CURRENT_DATE AND `modeofpayment` = '" . $data['modeofpayment'] . "' AND `seasonid` = '" . $_SESSION['seasondata']->id ?? '' . "'")) {
+        if ($this->query("SELECT * FROM `payments` WHERE `transid` = '{$data['transid']}' AND `datepaid` = CURRENT_DATE AND `modeofpayment` = '{$data['modeofpayment']}' AND `seasonid` = {$_SESSION['seasondata']->id}")) {
             $this->errors['transid'] = "Transaction number used already";
         }
 
