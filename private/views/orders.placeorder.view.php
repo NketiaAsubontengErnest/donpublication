@@ -27,7 +27,7 @@
                                                 <option value="<?= esc($row->id) ?>"><?= esc($row->customername) ?> (<?= esc($row->custlocation) ?>)</option>
                                             <?php endforeach; ?>
                                         <?php else : ?>
-                                            <option>No Customer Found</option>
+                                            <option value="">No Customer Found</option>
                                         <?php endif; ?>
                                     </select>
                                 <?php endif; ?>
@@ -41,7 +41,7 @@
                                                 <option value="<?= esc($row->id) ?>"><?= esc($row->typename) ?></option>
                                             <?php endforeach; ?>
                                         <?php else : ?>
-                                            <option>No Order Found</option>
+                                            <option value="">No Order Found</option>
                                         <?php endif; ?>
                                     </select>
                                 <?php else : ?>

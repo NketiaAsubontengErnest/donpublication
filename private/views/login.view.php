@@ -30,7 +30,7 @@
                     <div class="col-lg-4 mx-auto">
                         <div class="auth-form-light text-left py-5 px-4 px-sm-5">
                             <div class="brand-logo">
-                                <img src="<?=ASSETS?>/images/dondesign.png" alt="logo">
+                                <img src="<?=HOMEASSET?>/assets/img/_logo.png" alt="logo">
                             </div>
                             <h4>Use your Staff Number and password</h4>
                             <h6 class="font-weight-light">Sign in to continue.</h6>

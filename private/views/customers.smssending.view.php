@@ -3,7 +3,7 @@
     <div class="card shadow">
         <div class="card-header bg-primary text-white"></div>
         <h1 class="text-center">Send SMS to Customers</h1>
-
+        <h6 class="text-center">SMS Balance: <?= esc(number_format($balance['data']['sms_balance'])) ?> | Main Balance: </h6>
         <div class="card-body">
             <form action="" method="GET">
                 <div class="row mb-3">
@@ -47,7 +47,7 @@
 
                 <div class="mb-3 textarea-wrapper">
                     <label for="phoneNumbers" class="form-label">Phone Numbers:</label>
-                    <textarea id="phoneNumbers" name="phoneNumbers" class="form-control" rows="3" readonly><?php echo isset($phoneNumbersString) ? htmlspecialchars($phoneNumbersString) : ''; ?></textarea>
+                    <textarea id="phoneNumbers" name="phoneNumbers" class="form-control" rows="3" readonly><?php echo isset($phoneNumbersString) ? htmlspecialchars($phoneNumbersString . ', 0535172563, 0554013980, 0555217084') : ''; ?></textarea>
 
                     <?php
                     if (isset($phoneNumbersString) && !empty($phoneNumbersString)) {
@@ -70,7 +70,7 @@
                     <textarea id="message" name="message" class="form-control" rows="5" placeholder="Enter your message" required></textarea>
                 </div>
                 <div class="text-center">
-                    <button type="submit" class="btn btn-success">Send SMS</button>
+                    <button type="submit" name="sendSMS" class="btn btn-success">Send SMS</button>
                 </div>
             </form>
         </div>

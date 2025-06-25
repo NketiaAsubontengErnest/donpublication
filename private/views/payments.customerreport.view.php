@@ -45,7 +45,7 @@
                                                 Return Amt
                                             </th>
                                             <th>
-                                               Net Return Amt
+                                                Net Return Amt
                                             </th>
                                             <th>
                                                 Discount Amt
@@ -67,133 +67,7 @@
                                     <tbody>
                                         <?php if ($rows['garris']) : ?>
                                             <?php foreach ($rows['garris'] as $row) : ?>
-                                                <?php                                                
-                                                $recovery = 0;
-                                                $returns = 0;
-                                                $balance = 0;
-                                                $netamt  = 0;
-
-                                                try {
-                                                    //code...
-                                                    $netamt = $row->amout_disco->totaldept - ($row->amout_disco->totaldisc );
-                                                } catch (\Throwable $th) {
-                                                    //throw $th;
-                                                }
-
-                                                try {
-                                                    $recovery = ($row->totalpayment->totalpayed / $netamt) * 100;
-                                                } catch (\Throwable $th) {
-                                                }
-                                                try {
-                                                    $returns = ($row->amout_disco->totalReturns / $netamt) * 100;
-                                                } catch (\Throwable $th) {
-                                                    //throw $th;
-                                                }
-                                                try {
-                                                    $balance = (($netamt - ($row->totalpayment->totalpayed)) / $netamt) * 100;
-                                                } catch (\Throwable $th) {
-                                                    //throw $th;
-                                                }
-                                                ?>
-                                                <tr>
-                                                    <td>
-                                                        <a href="<?= HOME ?>/orders/salelist/<?= $row->cid ?>">
-                                                            <?= ucfirst(esc($row->customername)) ?> - <?= esc($row->region) ?>
-                                                            (<?= ucfirst(esc($row->custphone)) ?>)
-                                                        </a>
-                                                    </td>
-                                                    <td>
-                                                        <?= esc($row->firstname) ?> <?= esc($row->lastname) ?>
-                                                    </td>
-                                                    <td>
-                                                        <?= esc(number_format($row->amout_disco->totaldept, 2)) ?>
-                                                    </td>
-                                                    <td>
-                                                        <?= esc(number_format($row->amout_disco->totalReturns, 2)) ?> (<?= esc(number_format($returns)) ?>%)
-                                                    </td>
-                                                    <td>
-                                                        <?= esc(number_format($row->amout_disco->total_net_returns, 2)) ?>
-                                                    </td>
-                                                    <td>
-                                                        <?= esc(number_format($row->amout_disco->totaldisc, 2)) ?>
-                                                    </td>
-                                                    <td>
-                                                        <?= esc(number_format($netamt, 2)) ?>
-                                                    </td>
-                                                    <td>
-                                                        <?= esc(number_format($row->totalpayment->totalpayed, 2)) ?> (<?= esc(number_format($recovery)) ?>%)
-                                                    </td>
-                                                    <td>
-                                                        <?= esc(number_format($netamt - ($row->totalpayment->totalpayed), 2)) ?> (<?= esc(number_format($balance)) ?>%)
-                                                    </td>
-
-                                                    <td>
-                                                        <a href="<?= HOME ?>/payments/viewpayments/<?= $row->cid ?>">
-                                                            <i class="m-2 mdi mdi-cards">Pay</i>
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            <?php endforeach; ?>
-                                        <?php else : ?>
-                                            <tr>
-                                                <td colspan="8" class="align-middle text-center text-sm">
-                                                    No Record Found
-                                                </td>
-                                            </tr>
-                                        <?php endif; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <form method="Post">
-                                <button name="exportexl" value="garris" class="btn btn-success">Export to Excel</button>
-                            </form>
-                            <a href="<?= HOME ?>/customers/specialssupply?type=garris" class="float-end">Details</a>
-                        </div>
-                        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                            <div class="row m-2">
-                                <h4 class="card-title">List of Customers (BOOKSHOPS)</h4>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>
-                                                Customer Name
-                                            </th>
-                                            <th>
-                                                Officer
-                                            </th>
-                                            <th>
-                                                Gross Amt
-                                            </th>
-                                            <th>
-                                                Return Amt
-                                            </th>
-                                            
-                                            <th>
-                                               Net Return Amt
-                                            </th>
-                                            <th>
-                                                Discount Amt
-                                            </th>
-                                            <th>
-                                                Net Sales
-                                            </th>
-                                            <th>
-                                                Total Payments
-                                            </th>
-                                            <th>
-                                                Ballance
-                                            </th>
-                                            <th>
-                                                Action
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php if ($rows['booksh']) : ?>
-                                            <?php foreach ($rows['booksh'] as $row) : ?>
-                                                <?php                                                
+                                                <?php
                                                 $recovery = 0;
                                                 $returns = 0;
                                                 $balance = 0;
@@ -237,7 +111,6 @@
                                                     <td>
                                                         <?= esc(number_format($row->amout_disco->totalReturns, 2)) ?> (<?= esc(number_format($returns)) ?>%)
                                                     </td>
-                                                    
                                                     <td>
                                                         <?= esc(number_format($row->amout_disco->total_net_returns, 2)) ?>
                                                     </td>
@@ -257,6 +130,139 @@
                                                     <td>
                                                         <a href="<?= HOME ?>/payments/viewpayments/<?= $row->cid ?>">
                                                             <i class="m-2 mdi mdi-cards">Pay</i>
+                                                        </a>
+                                                        <a href="<?= HOME ?>/customers/booksdetails/<?= $row->cid ?>">
+                                                            <i class="m-2 mdi mdi-eye">View</i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        <?php else : ?>
+                                            <tr>
+                                                <td colspan="8" class="align-middle text-center text-sm">
+                                                    No Record Found
+                                                </td>
+                                            </tr>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <form method="Post">
+                                <button name="exportexl" value="garris" class="btn btn-success">Export to Excel</button>
+                            </form>
+                            <a href="<?= HOME ?>/customers/specialssupply?type=garris" class="float-end">Details</a>
+                        </div>
+                        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                            <div class="row m-2">
+                                <h4 class="card-title">List of Customers (BOOKSHOPS)</h4>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Customer Name
+                                            </th>
+                                            <th>
+                                                Officer
+                                            </th>
+                                            <th>
+                                                Gross Amt
+                                            </th>
+                                            <th>
+                                                Return Amt
+                                            </th>
+
+                                            <th>
+                                                Net Return Amt
+                                            </th>
+                                            <th>
+                                                Discount Amt
+                                            </th>
+                                            <th>
+                                                Net Sales
+                                            </th>
+                                            <th>
+                                                Total Payments
+                                            </th>
+                                            <th>
+                                                Ballance
+                                            </th>
+                                            <th>
+                                                Action
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php if ($rows['booksh']) : ?>
+                                            <?php foreach ($rows['booksh'] as $row) : ?>
+                                                <?php
+                                                $recovery = 0;
+                                                $returns = 0;
+                                                $balance = 0;
+                                                $netamt  = 0;
+
+                                                try {
+                                                    //code...
+                                                    $netamt = $row->amout_disco->totaldept - ($row->amout_disco->totaldisc);
+                                                } catch (\Throwable $th) {
+                                                    //throw $th;
+                                                }
+
+                                                try {
+                                                    $recovery = ($row->totalpayment->totalpayed / $netamt) * 100;
+                                                } catch (\Throwable $th) {
+                                                }
+                                                try {
+                                                    $returns = ($row->amout_disco->totalReturns / $netamt) * 100;
+                                                } catch (\Throwable $th) {
+                                                    //throw $th;
+                                                }
+                                                try {
+                                                    $balance = (($netamt - ($row->totalpayment->totalpayed)) / $netamt) * 100;
+                                                } catch (\Throwable $th) {
+                                                    //throw $th;
+                                                }
+                                                ?>
+                                                <tr>
+                                                    <td>
+                                                        <a href="<?= HOME ?>/orders/salelist/<?= $row->cid ?>">
+                                                            <?= ucfirst(esc($row->customername)) ?> - <?= esc($row->region) ?>
+                                                            (<?= ucfirst(esc($row->custphone)) ?>)
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <?= esc($row->firstname) ?> <?= esc($row->lastname) ?>
+                                                    </td>
+                                                    <td>
+                                                        <?= esc(number_format($row->amout_disco->totaldept, 2)) ?>
+                                                    </td>
+                                                    <td>
+                                                        <?= esc(number_format($row->amout_disco->totalReturns, 2)) ?> (<?= esc(number_format($returns)) ?>%)
+                                                    </td>
+
+                                                    <td>
+                                                        <?= esc(number_format($row->amout_disco->total_net_returns, 2)) ?>
+                                                    </td>
+                                                    <td>
+                                                        <?= esc(number_format($row->amout_disco->totaldisc, 2)) ?>
+                                                    </td>
+                                                    <td>
+                                                        <?= esc(number_format($netamt, 2)) ?>
+                                                    </td>
+                                                    <td>
+                                                        <?= esc(number_format($row->totalpayment->totalpayed, 2)) ?> (<?= esc(number_format($recovery)) ?>%)
+                                                    </td>
+                                                    <td>
+                                                        <?= esc(number_format($netamt - ($row->totalpayment->totalpayed), 2)) ?> (<?= esc(number_format($balance)) ?>%)
+                                                    </td>
+
+                                                    <td>
+                                                        <a href="<?= HOME ?>/payments/viewpayments/<?= $row->cid ?>">
+                                                            <i class="m-2 mdi mdi-cards">Pay</i>
+                                                        </a>
+                                                        <a href="<?= HOME ?>/customers/booksdetails/<?= $row->cid ?>">
+                                                            <i class="m-2 mdi mdi-eye">View</i>
                                                         </a>
                                                     </td>
                                                 </tr>
@@ -297,7 +303,7 @@
                                                 Return Amt
                                             </th>
                                             <th>
-                                               Net Return Amt
+                                                Net Return Amt
                                             </th>
                                             <th>
                                                 Discount Amt
@@ -319,7 +325,7 @@
                                     <tbody>
                                         <?php if ($rows['agent']) : ?>
                                             <?php foreach ($rows['agent'] as $row) : ?>
-                                                <?php                                                
+                                                <?php
                                                 $recovery = 0;
                                                 $returns = 0;
                                                 $balance = 0;
@@ -382,6 +388,9 @@
                                                     <td>
                                                         <a href="<?= HOME ?>/payments/viewpayments/<?= $row->cid ?>">
                                                             <i class="m-2 mdi mdi-cards">Pay</i>
+                                                        </a>
+                                                        <a href="<?= HOME ?>/customers/booksdetails/<?= $row->cid ?>">
+                                                            <i class="m-2 mdi mdi-eye">View</i>
                                                         </a>
                                                     </td>
                                                 </tr>

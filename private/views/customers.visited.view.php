@@ -80,9 +80,9 @@
                                                 if (isset($row->marketer->firstname)) {
                                                     echo esc($row->marketer->firstname);
                                                 }
-
+                                                echo " ";
                                                 if (isset($row->marketer->lastname)) {
-                                                    echo esc($row->marketer->lastname);
+                                                    echo  esc($row->marketer->lastname);
                                                 }
                                                 ?>
                                             </td>
@@ -95,13 +95,13 @@
                                             <td>
                                                 <?php // if (($row->officerid == Auth::getId()) && ($row->dateadded == date("Y-m-d", strtotime(date("Y-m-d")."-1 day")))) : 
                                                 ?>
-                                                <?php if (($row->officerid == Auth::getId()) || ($row->withother == Auth::getId())) : ?>
+                                                <?php if (($row->officerid == Auth::getId()) || ($row->withother == Auth::getId()) || (Auth::access('director'))) : ?>
                                                     <?php
                                                     $today = date('Y-m-d');
                                                     $dateAdded = date('Y-m-d', strtotime($row->dateadded));
                                                     ?>
 
-                                                    <?php if ($dateAdded === $today): ?>
+                                                    <?php if (($dateAdded === $today) || (Auth::access('director'))): ?>
                                                         <a href="<?= HOME ?>/customers/visitedit/<?= $row->id ?>">
                                                             <i class="m-2 mdi mdi-table-edit"> </i>Edit
                                                         </a>
@@ -190,7 +190,7 @@
                                             if (isset($row->marketer->firstname)) {
                                                 echo esc($row->marketer->firstname);
                                             }
-
+                                            echo " ";
                                             if (isset($row->marketer->lastname)) {
                                                 echo esc($row->marketer->lastname);
                                             }

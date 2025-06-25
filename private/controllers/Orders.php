@@ -296,7 +296,7 @@ class Orders extends Controller
                     $getordnum = $offs . '' . $year . '' . $_POST['customerid'] . '' . $zeros . '' . $ordnumnew;
                 }
                 //get current Season
-                $seasid = $seas->selctingLastId()[0]->id;
+                $seasid = $_SESSION['seasondata'] != null ? $_SESSION['seasondata']->id : "";
 
                 for ($count = 0; $count < count($_POST['hidden_book']); $count++) {
                     $data = array(

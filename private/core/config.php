@@ -17,9 +17,9 @@ define('HOMEASSET', "$scheme://$server/public/homeasset");
 //database variables
  */
 
-define('DBHOST','localhost');
-define('DBNAME','donpublication');
-define('DBUSER','root');
-define('DBPASS','0554013980A@');
-define('DBDRIVER','mysql');
-define('COMPANY','DON PUB. LTD');
+define('DBHOST', 'localhost');
+define('DBNAME', 'donpublication');
+define('DBUSER', 'root');
+define('DBPASS', '0554013980A@');
+define('DBDRIVER', 'mysql');
+define('COMPANY', 'DON SERIES');

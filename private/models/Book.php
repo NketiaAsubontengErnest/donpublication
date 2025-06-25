@@ -82,11 +82,9 @@ class Book extends Model
    {
       $newstoc = new Newstock();
       foreach ($data as $key => $row) {
-         $seas = new Season();
-         //get current Season
-         $seasid = isset($seas->selctingLastId()[0]->id) ? $seas->selctingLastId()[0]->id : '';
          $arr['bookid'] = $row->id;
-         $arr['seasonid'] = $seasid;
+         //get current Season
+         $arr['seasonid'] = $_SESSION['seasondata']->id ?? '';
 
          $query = "SELECT SUM(`quantity`) AS ttAdded FROM `newstocks` WHERE `bookid` =:bookid AND `seasonid` =:seasonid";
          $result = $newstoc->query($query, $arr);
@@ -98,11 +96,9 @@ class Book extends Model
    {
       $order = new Order();
       foreach ($data as $key => $row) {
-         $seas = new Season();
-         //get current Season
-         $seasid = isset($seas->selctingLastId()[0]->id) ? $seas->selctingLastId()[0]->id : '';
          $arr['bookid'] = $row->id;
-         $arr['seasonid'] = $seasid;
+         //get current Season
+         $arr['seasonid'] = $_SESSION['seasondata']->id ?? '';
 
          $query = "SELECT SUM(`quantsupp`) AS ttSupply, (SUM(`quantsupp` - `retverquant`)) AS actualSupply FROM `orders` WHERE `bookid` =:bookid AND `seasonid`=:seasonid AND `ordertype` != '1'";
          $result = $order->query($query, $arr);
@@ -115,11 +111,9 @@ class Book extends Model
    {
       $order = new Order();
       foreach ($data as $key => $row) {
-         $seas = new Season();
-         //get current Season
-         $seasid = isset($seas->selctingLastId()[0]->id) ? $seas->selctingLastId()[0]->id : '';
          $arr['bookid'] = $row->id;
-         $arr['seasonid'] = $seasid;
+         //get current Season
+         $arr['seasonid'] = $_SESSION['seasondata']->id ?? '';
          $arr['officerid'] = $id;
 
          $query = "SELECT SUM(`quantsupp`) AS ttSupply, (SUM(`quantsupp` - `retverquant`)) AS actualSupply, SUM((`quantsupp` - `retverquant`) * `unitprice`) AS book_gross, SUM(((`quantsupp` - `retverquant`) * `unitprice`) - (((`quantsupp` - `retverquant`) * `unitprice`) * (`discount`/100))) AS book_net, SUM((`retverquant` * `unitprice`) - ((`retverquant` * `unitprice`) * (`discount`/100))) AS return_net FROM `orders` JOIN `customers` ON customers.`id` = `customerid` WHERE customers.`custtype` = 'school' AND `bookid` =:bookid AND `seasonid`=:seasonid AND orders.`officerid` =:officerid AND `ordertype` != '1'";
@@ -133,11 +127,9 @@ class Book extends Model
    {
       $order = new Order();
       foreach ($data as $key => $row) {
-         $seas = new Season();
-         //get current Season
-         $seasid = isset($seas->selctingLastId()[0]->id) ? $seas->selctingLastId()[0]->id : '';
          $arr['bookid'] = $row->id;
-         $arr['seasonid'] = $seasid;
+         //get current Season
+         $arr['seasonid'] = $_SESSION['seasondata']->id ?? '';
 
          $query = "SELECT SUM(`quantsupp`) AS ttSampleSupply FROM `orders` WHERE `bookid` =:bookid AND `seasonid`=:seasonid AND orders.`ordertype` = '1'";
          $result = $order->query($query, $arr);
@@ -150,11 +142,9 @@ class Book extends Model
    {
       $order = new Order();
       foreach ($data as $key => $row) {
-         $seas = new Season();
-         //get current Season
-         $seasid = isset($seas->selctingLastId()[0]->id) ? $seas->selctingLastId()[0]->id : '';
          $arr['bookid'] = $row->id;
-         $arr['seasonid'] = $seasid;
+         //get current Season
+         $arr['seasonid'] = $_SESSION['seasondata']->id ?? '';
          $arr['officerid'] = $id;
 
          $query = "SELECT SUM(`quantsupp`) AS ttMarkSampleSupply, (SELECT SUM(`retverquant`) FROM `orders` WHERE `bookid` = :bookid AND `seasonid` = :seasonid AND `officerid` = :officerid AND `ordertype` = '1') AS retsample FROM `orders` WHERE `bookid` =:bookid AND `seasonid`=:seasonid AND orders.`ordertype` = '1' AND orders.`officerid` =:officerid";
@@ -168,11 +158,9 @@ class Book extends Model
    {
       $order = new Order();
       foreach ($data as $key => $row) {
-         $seas = new Season();
-         //get current Season
-         $seasid = isset($seas->selctingLastId()[0]->id) ? $seas->selctingLastId()[0]->id : '';
          $arr['bookid'] = $row->id;
-         $arr['seasonid'] = $seasid;
+         //get current Season
+         $arr['seasonid'] = $_SESSION['seasondata']->id ?? '';
 
          $query = "SELECT SUM(`retverquant`) AS ttreturns FROM `orders` WHERE `bookid` =:bookid AND `seasonid`=:seasonid AND `ordertype` != '1'";
          $result = $order->query($query, $arr);
@@ -185,11 +173,9 @@ class Book extends Model
    {
       $order = new Order();
       foreach ($data as $key => $row) {
-         $seas = new Season();
-         //get current Season
-         $seasid = isset($seas->selctingLastId()[0]->id) ? $seas->selctingLastId()[0]->id : '';
          $arr['bookid'] = $row->id;
-         $arr['seasonid'] = $seasid;
+         //get current Season
+         $arr['seasonid'] = $_SESSION['seasondata']->id ?? '';
          $arr['officerid'] = $id;
 
          $query = "SELECT SUM(`retverquant`) AS ttmarketreturns, (SELECT SUM(`retverquant`) FROM `orders` JOIN `customers` ON customers.`id` = `customerid` WHERE customers.`custtype` = 'school' AND `bookid` = :bookid AND `seasonid` = :seasonid AND orders.`officerid` = :officerid AND `ordertype` = '1') AS retsample FROM `orders`  JOIN `customers` ON customers.`id` = `customerid` WHERE customers.`custtype` = 'school' AND `bookid` = :bookid AND `seasonid` = :seasonid AND orders.`officerid` = :officerid AND `ordertype` != '1'";
@@ -218,11 +204,9 @@ class Book extends Model
    {
       $order = new Order();
       foreach ($data as $key => $row) {
-         $seas = new Season();
-         //get current Season
-         $seasid = isset($seas->selctingLastId()[0]->id) ? $seas->selctingLastId()[0]->id : '';
          $arr['bookid'] = $row->id;
-         $arr['seasonid'] = $seasid;
+         //get current Season
+         $arr['seasonid'] = $_SESSION['seasondata']->id ?? '';
          $arr['custtype'] = $specialtype;
 
          $query = "SELECT SUM(`quantsupp`) AS ttSpecialSupply, (SELECT SUM(`retverquant`) FROM `orders` JOIN `customers` ON customers.`id` = `customerid` WHERE customers.`custtype` = :custtype AND `bookid` = :bookid AND `seasonid` = :seasonid AND `ordertype` != '1') AS retsample FROM `orders` JOIN `customers` ON customers.`id` = `customerid` WHERE customers.`custtype` = :custtype AND `bookid` =:bookid AND `seasonid`=:seasonid AND `ordertype` != '1'";
@@ -235,11 +219,9 @@ class Book extends Model
    {
       $order = new Order();
       foreach ($data as $key => $row) {
-         $seas = new Season();
-         //get current Season
-         $seasid = isset($seas->selctingLastId()[0]->id) ? $seas->selctingLastId()[0]->id : '';
          $arr['bookid'] = $row->id;
-         $arr['seasonid'] = $seasid;
+         //get current Season
+         $arr['seasonid'] = $_SESSION['seasondata']->id ?? '';
          $arr['custtype'] = $specialtype;
 
          $query = "SELECT SUM(`retverquant`) AS ttSpecialreturns, (SELECT SUM(`retverquant`) FROM `orders` JOIN `customers` ON customers.`id` = `customerid` WHERE customers.`custtype` = :custtype AND `bookid` = :bookid AND `seasonid` = :seasonid AND `ordertype` = '1') AS retsample FROM `orders`  JOIN `customers` ON customers.`id` = `customerid` WHERE customers.`custtype` = :custtype AND `bookid` = :bookid AND `seasonid` = :seasonid AND `ordertype` != '1'";

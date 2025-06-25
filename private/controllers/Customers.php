@@ -131,7 +131,7 @@ class Customers extends Controller
 
             $data1 = $visitors->get_Officer($data1);
 
-            $fields = array('Customer Name', 'Contact Person', 'Phone Number', 'Location', 'Region', 'Marketer', 'Work Book', 'Text Book', 'Total Books');
+            $fields = array('Customer Name', 'Contact Person', 'Phone Number', 'Location', 'Region', 'Marketer', 'Work Book', 'Text Book', 'Total Books', 'Visit Type', 'Date');
             $excelData = implode("\t", array_values($fields)) . "\n";
             if ($data1) {
                 foreach ($data1 as $row) {
@@ -140,7 +140,7 @@ class Customers extends Controller
                     } catch (\Throwable $th) {
                         $totalQty = 0;
                     }
-                    $lineData = array(esc($row->customername), esc($row->contactperson), esc($row->custphone), esc($row->custlocation), esc($row->region), esc($row->marketer->firstname) . " " . esc($row->marketer->lastname), esc(number_format($row->workbook)), esc(number_format($row->textbook)), esc(number_format($totalQty)));
+                    $lineData = array(esc($row->customername), esc($row->contactperson), esc($row->custphone), esc($row->custlocation), esc($row->region), esc($row->marketer->firstname) . " " . esc($row->marketer->lastname), esc(number_format($row->workbook)), esc(number_format($row->textbook)), esc(number_format($totalQty)), esc($row->visittype), esc($row->dateadded));
                     $excelData .= implode("\t", array_values($lineData)) . "\n";
                 }
                 export_data_to_excel($fields, $excelData, 'Sample_Report');
@@ -263,15 +263,18 @@ class Customers extends Controller
         }
 
         if (isset($_POST['sendSMS'])) {
+            unset($_POST['sendSMS']);
+
             $message = $_POST['message'];
-            $phoneNumbers = $_POST['phoneNumbers'];
+            $phoneNumbers = array_map('trim', explode(',', $_POST['phoneNumbers']));
 
             // Send SMS logic here
             // You can use an SMS gateway API to send the message to the phone numbers
             $curl = curl_init();
 
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://devapi.fayasms.com/messages',
+            curl_setopt_array($curl, [
+                CURLOPT_URL => 'https://sms.arkesel.com/api/v2/sms/send',
+                CURLOPT_HTTPHEADER => ['api-key: OnhIWHcwU1ZMalBzUldnSUU='],
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -279,21 +282,26 @@ class Customers extends Controller
                 CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => json_encode([
-                    "sender" => "DON SERIES",
-                    "message" => $message,
-                    "recipients" => $phoneNumbers,
+                CURLOPT_POSTFIELDS => http_build_query([
+                    'sender' => 'DON SERIES',
+                    'message' => $message,
+                    'recipients' => $phoneNumbers,
+                    // When sending SMS to Nigerian recipients, specify the use_case field
+                    // 'use_case' => 'transactional'
                 ]),
-                CURLOPT_HTTPHEADER => array(
-                    'fayasms-developer: app_key.app_secret',
-                    'Content-Type: application/json'
-                ),
-            ));
+            ]);
 
-            $response = curl_exec($curl);
+            $json = curl_exec($curl);
 
-            if (curl_errno($curl)) {
-                $_SESSION['messsage'] = "SMS sending failed: " . curl_error($curl);
+            $response = json_decode($json, true);
+
+            // Access the status
+            $status = $response['status'];
+
+            curl_close($curl);
+
+            if (!$status == 'success') {
+                $_SESSION['messsage'] = "SMS sending failed " . curl_error($curl);
                 $_SESSION['status_code'] = "error";
                 $_SESSION['status_headen'] = "Oops!";
             } else {
@@ -301,14 +309,30 @@ class Customers extends Controller
                 $_SESSION['status_code'] = "success";
                 $_SESSION['status_headen'] = "Good job!";
             }
-
-            curl_close($curl);
-
-            $_SESSION['messsage'] = "SMS sent successfully!";
-            $_SESSION['status_code'] = "success";
-            $_SESSION['status_headen'] = "Good job!";
+            $this->redirect('customers/smssending');
         }
 
+        // Fetch balance details
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, [
+            CURLOPT_URL => 'https://sms.arkesel.com/api/v2/clients/balance-details',
+            CURLOPT_HTTPHEADER => ['api-key: OnhIWHcwU1ZMalBzUldnSUU='],
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+        ]);
+
+        $jsbalance = curl_exec($curl);
+
+        curl_close($curl);
+
+        $balancedata = json_decode($jsbalance, true);
 
         //this are for breadcrumb
         $crumbs[] = ['Dashboard', 'dashboard'];
@@ -318,6 +342,7 @@ class Customers extends Controller
         return $this->view('customers.smssending', [
             'crumbs' => $crumbs,
             'pager' => $pager,
+            'balance' => $balancedata,
             'phoneNumbersString' => $phoneNumbersString,
             'hiddenSearch' => $hiddenSearch,
             'actives' => $actives

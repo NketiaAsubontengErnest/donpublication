@@ -907,10 +907,13 @@ class Payments extends Controller
             $progitData = $tithe->getTithe($ttSales, $ttPayment, $_POST['amount'], $id);
 
             $_POST['customerid'] = $id;
+
             $_POST['seasonid'] = $_SESSION['seasondata']->id;
 
             if ($payments->validate($_POST)) {
                 $progitData['seasonid'] = $_SESSION['seasondata']->id;
+
+
                 if ($progitData['tithe'] > 0) {
                     $tithe->insert($progitData);
                     $_POST['titheid'] = $tithe->selctingId()[0]->id;
