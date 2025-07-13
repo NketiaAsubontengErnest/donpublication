@@ -73,7 +73,7 @@
 <body>
 
 
-	<a href="https://wa.me/+233554013980?text=Hello%20Don%20Series,%20I'd%20like%20to%20know%20more%20about%20your%20books." target="_blank" class="float">
+	<a href="https://wa.me/+233551666224?text=Hello%20Don%20Series,%20I'd%20like%20to%20know%20more%20about%20your%20books." target="_blank" class="float">
 		<i class="fa fa-whatsapp"></i>
 	</a>
 

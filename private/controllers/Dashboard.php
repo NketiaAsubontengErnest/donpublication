@@ -42,11 +42,23 @@ class Dashboard extends Controller
         if (Auth::getRank() == 'marketer') {
             $querysup = "SELECT SUM(`quantsupp`) AS quantsupp, SUM(`retverquant`) AS retverquant FROM `orders` WHERE `seasonid`=:seasonid AND `officerid` = {$userid}";
 
-            $querysupsamp = "SELECT SUM(`quantsupp`) AS quantsuppsamp FROM `orders` WHERE `seasonid`={$arr['seasonid']} AND `officerid` = {$userid} AND `ordertype` = 1";
+            $querysupsamp = "SELECT SUM(`quantsupp` - `retverquant`) AS quantsuppsamp FROM `orders` WHERE `seasonid`={$arr['seasonid']} AND `officerid` = {$userid} AND `ordertype` = 1";
             $ordsamp = $orders->query($querysupsamp)[0];
             $data['ordersamp'] = isset($ordsamp) ? $ordsamp : '';
 
-            $queryqtyorders = "SELECT COUNT(DISTINCT `ordernumber`) AS orderss FROM `orders` WHERE `officerid` = {$userid} AND `seasonid`= {$arr['seasonid']} AND `quantsupp` !=''";
+            $querysupsamp = "SELECT SUM(`quantsupp` - `retverquant`) AS quantsuppcash FROM `orders` WHERE `seasonid`={$arr['seasonid']} AND `officerid` = {$userid} AND `ordertype` = 3";
+            $ordsamp = $orders->query($querysupsamp)[0];
+            $data['ordercash'] = isset($ordsamp) ? $ordsamp : '';
+
+            $querysupsamp = "SELECT SUM(`quantsupp` - `retverquant`) AS quantsuppcredit FROM `orders` WHERE `seasonid`={$arr['seasonid']} AND `officerid` = {$userid} AND `ordertype` = 2";
+            $ordsamp = $orders->query($querysupsamp)[0];
+            $data['ordercredit'] = isset($ordsamp) ? $ordsamp : '';
+
+            $querysupsamp = "SELECT SUM(`quantsupp` - `retverquant`) AS quantsuppothers FROM `orders` WHERE `seasonid`={$arr['seasonid']} AND `officerid` = {$userid} AND (`ordertype` = 3 OR `ordertype` = 2 OR `ordertype` = 1)";
+            $ordsamp = $orders->query($querysupsamp)[0];
+            $data['orderothers'] = isset($ordsamp) ? $ordsamp : '';
+
+            $queryqtyorders = "SELECT COUNT(DISTINCT `ordernumber`) AS orderss FROM `orders` WHERE `officerid` = {$userid} AND `seasonid`= {$arr['seasonid']} AND `quantsupp` !='' ";
             $ord = $orders->query($queryqtyorders)[0];
             $data['orders'] = isset($ord) ? $ord : '';
 

@@ -105,10 +105,10 @@
                             <?php try { ?>
                                 <p class="fs-30 mb-5"><?= esc(number_format($rows['orders']->orderss)) ?></p>
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-6">
                                         <p><?= esc($rows['ordersnotver']->ordersnv) ?> Verified</p>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-6">
                                         <p><?= esc($rows['orders']->orderss - $rows['ordersnotver']->ordersnv) ?> Unverified</p>
                                     </div>
                                 </div>
@@ -123,13 +123,26 @@
                         <div class="card-body">
                             <p class="mb-4">Total Books Supplied</p>
                             <?php try { ?>
-                                <p class="fs-30 mb-5"><?= esc(number_format($rows['order']->quantsupp - $rows['order']->retverquant)) ?></p>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <p><?= esc(number_format($rows['ttshered']->ttshered)) ?> Shared</p>
+                                <p class="fs-30 mb-2"><?= esc(number_format($rows['order']->quantsupp - $rows['order']->retverquant)) ?></p>
+
+                                <div class="row mb-2">
+                                    <div class="col-4">
+                                        <small>Cash: <?= esc(number_format($rows['ordercash']->quantsuppcash ?? 0)) ?></small>
                                     </div>
-                                    <div class="col-md-6">
-                                        <p>Total Samples: <?= esc(number_format($rows['ordersamp']->quantsuppsamp)) ?></p>
+                                    <div class="col-4">
+                                        <small>Credit: <?= esc(number_format($rows['ordercredit']->quantsuppcredit ?? 0)) ?></small>
+                                    </div>
+                                    <div class="col-4">
+                                        <small>Others: <?= esc(number_format($rows['orderothers']->quantsuppothers ?? 0)) ?></small>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-6">
+                                        <p>Samples: <?= esc(number_format($rows['ordersamp']->quantsuppsamp)) ?></p>
+                                    </div>
+                                    <div class="col-6">
+                                        <p>Shared: <?= esc(number_format($rows['ttshered']->ttshered)) ?></p>
                                     </div>
 
                                 </div>
