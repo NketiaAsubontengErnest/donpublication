@@ -144,6 +144,7 @@ class Payment extends Model
         $result = $order->query($query, $arr);
         return is_array($result) ? $result[0] : array();;
     }
+
     public function get_TotalPay($id)
     {
         $payme = new Payment();

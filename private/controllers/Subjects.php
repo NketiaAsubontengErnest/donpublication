@@ -164,7 +164,7 @@ class Subjects extends Controller
         }
 
         if (isset($_POST['exportexl'])) {
-            $fields = array('Book', 'Opening stock', 'Quantiry Added', 'Total Quantiry', 'Qty Supplied', 'Actual Supply', 'Sample Qty', 'Qty Returned', 'Closing Instock');
+            $fields = array('Book', 'Opening stock', 'Quantiry Added', 'Total Quantiry', 'Qty Supplied', 'Actual Supply', 'Sample Qty', 'Qty Returned', 'Qty Samp Returned', 'Closing Instock');
             $excelData = implode("\t", array_values($fields)) . "\n";
             $rowsex = $books->findAll();
             if ($rowsex) {
@@ -174,7 +174,18 @@ class Subjects extends Controller
                     } catch (\Throwable $th) {
                         $totalQty = 0;
                     }
-                    $lineData = array(esc($row->level->class . ' ' . $row->subject->subject . ' ' . $row->booktype->booktype), esc(number_format($row->Openstock)), esc(number_format($row->ttadded->ttAdded)), esc(number_format($totalQty)), esc(number_format($row->ttSupply->ttSupply)), esc(number_format($row->ttSupply->actualSupply)), esc(number_format($row->ttSampleSupply->ttSampleSupply)), esc(number_format($row->ttreturns->ttreturns)), esc(number_format($row->quantity)));
+                    $lineData = array(
+                        esc($row->level->class . ' ' . $row->subject->subject . ' ' . $row->booktype->booktype),
+                        esc(number_format($row->Openstock)),
+                        esc(number_format($row->ttadded->ttAdded)),
+                        esc(number_format($totalQty)),
+                        esc(number_format($row->ttSupply->ttSupply)),
+                        esc(number_format($row->ttSupply->actualSupply)),
+                        esc(number_format($row->ttSampleSupply->ttSampleSupply)),
+                        esc(number_format($row->ttreturns->ttreturns)),
+                        esc(number_format($row->tt_samp_returns->tt_samp_returns)),
+                        esc(number_format($row->quantity))
+                    );
                     $excelData .= implode("\t", array_values($lineData)) . "\n";
                 }
                 export_data_to_excel($fields, $excelData, 'Books_Report');

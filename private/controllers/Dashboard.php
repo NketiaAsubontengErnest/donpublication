@@ -80,7 +80,7 @@ class Dashboard extends Controller
             $query = "SELECT SUM(`quantity`) AS quantity FROM `books`;";
             $data['books'] = isset($books->query($query)[0]) ? $books->query($query)[0] : '';
 
-            $querysup = "SELECT SUM(`quantsupp`) AS quantsupp, SUM(`retverquant`) AS retverquant FROM `orders` WHERE `seasonid`=:seasonid;";
+            $querysup = "SELECT SUM(`quantsupp`) AS quantsupp, SUM(`retverquant`) AS retverquant FROM `orders` WHERE `seasonid`=:seasonid ;";
 
             $query = "SELECT COUNT(*) AS les FROM `books` WHERE `quantity` <= `treshhold`";
             $bkq = $books->query($query)[0];
@@ -89,7 +89,7 @@ class Dashboard extends Controller
             $bb = $books->selectCount()[0];
             $data['ttbooks'] = isset($bb) ? $bb : '';
 
-            $querysample = "SELECT SUM(`quantsupp`) AS quantsuppSamp FROM `orders` WHERE `seasonid`=:seasonid AND `ordertype` = '1';";
+            $querysample = "SELECT SUM(`quantsupp` - `retverquant`) AS quantsuppSamp FROM `orders` WHERE `seasonid`=:seasonid AND `ordertype` = '1';";
             $samp = $books->query($querysample, $arr)[0];
             $data['sampleorder'] = isset($samp) ? $samp : '';
         }

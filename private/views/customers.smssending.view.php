@@ -73,6 +73,43 @@
                     <button type="submit" name="sendSMS" class="btn btn-success">Send SMS</button>
                 </div>
             </form>
+
+            <form action="" method="post">
+                <div class="row mb-3 mt-4">
+                    <label for=""> <code>To send individual message use</code> </label>
+                    <div class="col-md-6 mt-2">
+                        <select id="tableName" name="tableName" class="form-select" required>
+                            <option value="">--Select Data Source --</option>
+                            <option value="customers">Customers</option>
+                            <option value="visitors">Visitors</option>
+                            <!-- Add more table options as needed -->
+                        </select>
+                    </div>
+                    <div class="col-md-6 mt-2">
+                        <button type="submit" name="sendIndividualSMS" class="btn btn-warning">
+                            Individual SMS
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <form action="" method="post">
+                <div class="row mb-3 mt-4">
+                    <label for=""> <code>To send individual message use</code> </label>
+                    <div class="col-md-6 mt-2">
+                        <input type="text" name="phoneNumber" class="form-control" placeholder="Enter individual phone number" required>
+                    </div>
+                    <div class="col-md-6 mt-2">
+                        <input type="text" name="individualMessage" class="form-control" placeholder="Enter your message" required>
+                    </div>
+                    <div class="col-md-6 mt-2">
+                        <button type="submit" name="testsms" class="btn btn-warning">
+                            Individual SMS
+                        </button>
+                    </div>
+                </div>
+            </form>
+
         </div>
     </div>
     <?php $this->view('includes/footer'/*, ['crumbs'=>$crumbs, 'actives'=>$actives]*/) ?>

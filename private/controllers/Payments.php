@@ -913,13 +913,32 @@ class Payments extends Controller
             if ($payments->validate($_POST)) {
                 $progitData['seasonid'] = $_SESSION['seasondata']->id;
 
-
                 if ($progitData['tithe'] > 0) {
                     $tithe->insert($progitData);
                     $_POST['titheid'] = $tithe->selctingId()[0]->id;
                 }
 
                 $payments->insert($_POST);
+
+                try {
+                    $amountPaid = $_POST['amount'];
+
+                    $balance = $ttSales->totalNetSales - $_POST['amount'];
+
+                    $cust = $coust->where('id', $id)[0];
+
+                    $custName = shortenText($cust->customername, 20);
+
+                    $message = "Hi $custName, GHS $amountPaid received. Balance: GHS $balance. Thank you for your payment.";
+
+                    //singlesendSms($cust->custphone, $message);
+                } catch (Exception $e) {
+                    // Handle exception if sending SMS fails
+                    $_SESSION['messsage'] = "Payment recorded but SMS notification failed. Error: " . $e->getMessage();
+                    $_SESSION['status_code'] = "warning";
+                    $_SESSION['status_headen'] = "Warning!";
+                }
+
                 return $this->redirect('payments/viewpayments/' . $id);
             } else {
                 $errors = $payments->errors;

@@ -28,6 +28,7 @@ class Book extends Model
       'get_Supply',
       'get_Sample_Supply',
       'get_Returns',
+      'get_Sample_Returns',
    ];
 
    public function validate($data)
@@ -78,6 +79,7 @@ class Book extends Model
       }
       return $data;
    }
+
    public function get_Added($data)
    {
       $newstoc = new Newstock();
@@ -92,6 +94,7 @@ class Book extends Model
       }
       return $data;
    }
+
    public function get_Supply($data)
    {
       $order = new Order();
@@ -150,6 +153,21 @@ class Book extends Model
          $query = "SELECT SUM(`quantsupp`) AS ttMarkSampleSupply, (SELECT SUM(`retverquant`) FROM `orders` WHERE `bookid` = :bookid AND `seasonid` = :seasonid AND `officerid` = :officerid AND `ordertype` = '1') AS retsample FROM `orders` WHERE `bookid` =:bookid AND `seasonid`=:seasonid AND orders.`ordertype` = '1' AND orders.`officerid` =:officerid";
          $result = $order->query($query, $arr);
          $data[$key]->ttMarkSampleSupply = is_array($result) ? $result[0] : array();
+      }
+      return $data;
+   }
+
+   public function get_Sample_Returns($data)
+   {
+      $order = new Order();
+      foreach ($data as $key => $row) {
+         $arr['bookid'] = $row->id;
+         //get current Season
+         $arr['seasonid'] = $_SESSION['seasondata']->id ?? '';
+
+         $query = "SELECT SUM(`retverquant`) AS tt_samp_returns FROM `orders` WHERE `bookid` =:bookid AND `seasonid`=:seasonid AND `ordertype` = '1'";
+         $result = $order->query($query, $arr);
+         $data[$key]->tt_samp_returns = is_array($result) ? $result[0] : array();
       }
       return $data;
    }

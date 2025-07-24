@@ -205,6 +205,7 @@ class Customers extends Controller
         $pager = new Pager($limit);
         $offset = $pager->offset;
 
+        $marketers = new User();
         $customer = new Customer();
         $alldata = array();
 
@@ -262,46 +263,81 @@ class Customers extends Controller
             $phoneNumbersString = implode(', ', $phoneNumbers);
         }
 
-        if (isset($_POST['sendSMS'])) {
+        if (isset($_POST['testsms'])) {
+            $phoneNumbersString = $_POST['phoneNumber'];
+            $message = $_POST['individualMessage'];
+            $response = singlesendSms($message, $phoneNumbersString);
+            $status = $response['code'];
+            if (!$status == 'ok') {
+                $_SESSION['messsage'] = "SMS sending failed " . $response['message'];
+                $_SESSION['status_code'] = "error";
+                $_SESSION['status_headen'] = "Oops!";
+            } else {
+                $_SESSION['messsage'] = "SMS sent successfully!";
+                $_SESSION['status_code'] = "success";
+                $_SESSION['status_headen'] = "Good job!";
+            }
+        } elseif (isset($_POST['sendIndividualSMS'])) {
+            unset($_POST['sendIndividualSMS']);
+
+            $tableName = $_POST['tableName'];
+
+            $response = [];
+
+            $dataOfficer = $marketers->where('rank', 'marketer');
+
+            foreach ($dataOfficer as $rowOfficer) {
+
+                if ($tableName == 'visitors') {
+                    $data = $visitors->query("SELECT custphone FROM $tableName where  custphone != '' AND `seasonid` = :seasonid AND `officerid` = :officerid", ['seasonid' => $seasid, 'officerid' => $rowOfficer->id]);
+                } else if ($tableName == 'customers') {
+                    $data = $customer->query("SELECT custphone FROM $tableName where custphone != '' AND `officerid` = :officerid", ['officerid' => $rowOfficer->id]);
+                }
+
+                $marketerName = $rowOfficer->firstname ?? "Don"; // fallback from row itself
+                $marketerPhone = $rowOfficer->phone ?? "0554013980";   // corrected to use phone field
+
+                $message = "Hello! Place your order now, kindly contact our marketer on $marketerPhone. $marketerName will be happy to assist you with your needs and finalize your order.";
+
+                foreach ($data as $row) {
+                    if (strlen($row->custphone) == 10) {
+                        $phoneNumbers[] = $row->custphone;
+                    }
+                }
+
+                $response = sendSms($message, $phoneNumbers);
+
+                $phoneNumbers = [];
+            }
+
+            $status = $response['status'];
+
+            if (!$status == 'success') {
+                $_SESSION['messsage'] = "SMS sending failed " . $response['message'];
+                $_SESSION['status_code'] = "error";
+                $_SESSION['status_headen'] = "Oops!";
+            } else {
+                $_SESSION['messsage'] = "SMS sent successfully!";
+                $_SESSION['status_code'] = "success";
+                $_SESSION['status_headen'] = "Good job!";
+            }
+
+            $this->redirect('customers/smssending');
+        } elseif (isset($_POST['sendSMS'])) {
             unset($_POST['sendSMS']);
 
             $message = $_POST['message'];
             $phoneNumbers = array_map('trim', explode(',', $_POST['phoneNumbers']));
 
-            // Send SMS logic here
-            // You can use an SMS gateway API to send the message to the phone numbers
-            $curl = curl_init();
 
-            curl_setopt_array($curl, [
-                CURLOPT_URL => 'https://sms.arkesel.com/api/v2/sms/send',
-                CURLOPT_HTTPHEADER => ['api-key: OnhIWHcwU1ZMalBzUldnSUU='],
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => http_build_query([
-                    'sender' => 'DON SERIES',
-                    'message' => $message,
-                    'recipients' => $phoneNumbers,
-                    // When sending SMS to Nigerian recipients, specify the use_case field
-                    // 'use_case' => 'transactional'
-                ]),
-            ]);
 
-            $json = curl_exec($curl);
-
-            $response = json_decode($json, true);
+            $response = sendSms($message, $phoneNumbers);
 
             // Access the status
             $status = $response['status'];
 
-            curl_close($curl);
-
             if (!$status == 'success') {
-                $_SESSION['messsage'] = "SMS sending failed " . curl_error($curl);
+                $_SESSION['messsage'] = "SMS sending failed " . $response['message'];
                 $_SESSION['status_code'] = "error";
                 $_SESSION['status_headen'] = "Oops!";
             } else {
@@ -312,27 +348,9 @@ class Customers extends Controller
             $this->redirect('customers/smssending');
         }
 
-        // Fetch balance details
 
-        $curl = curl_init();
 
-        curl_setopt_array($curl, [
-            CURLOPT_URL => 'https://sms.arkesel.com/api/v2/clients/balance-details',
-            CURLOPT_HTTPHEADER => ['api-key: OnhIWHcwU1ZMalBzUldnSUU='],
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ]);
-
-        $jsbalance = curl_exec($curl);
-
-        curl_close($curl);
-
-        $balancedata = json_decode($jsbalance, true);
+        $balancedata = checkSmsBalance();
 
         //this are for breadcrumb
         $crumbs[] = ['Dashboard', 'dashboard'];
