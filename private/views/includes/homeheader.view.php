@@ -107,10 +107,10 @@
 								<li class="<?= $actives === 'about' ? 'current-list-item' : '' ?>"><a href="<?= HOME ?>/home/about">About</a></li>
 
 
-								<li class="<?= $actives === 'contact' ? 'current-list-item' : '' ?>"><a href="https://shop.donpublicationonline.com/contact-us/">Contact</a></li>
-								<li class="<?= $actives === 'shop' ? 'current-list-item' : '' ?>"><a href="https://shop.donpublicationonline.com/shop/">Shop</a></li>
-								<li class="<?= $actives === 'shop' ? 'current-list-item' : '' ?>"><a href="https://shop.donpublicationonline.com/gallery/">Gallery</a></li>
-								<li class="<?= $actives === 'shop' ? 'current-list-item' : '' ?>"><a href="https://shop.donpublicationonline.com/downloads/">Downloads</a></li>
+								<li class="<?= $actives === 'contact' ? 'current-list-item' : '' ?>"><a href="https://donpublicationonline.com/contact-us/">Contact</a></li>
+								<li class="<?= $actives === 'shop' ? 'current-list-item' : '' ?>"><a href="https://donpublicationonline.com/shop/">Shop</a></li>
+								<li class="<?= $actives === 'shop' ? 'current-list-item' : '' ?>"><a href="https://donpublicationonline.com/gallery/">Gallery</a></li>
+								<li class="<?= $actives === 'shop' ? 'current-list-item' : '' ?>"><a href="https://donpublicationonline.com/downloads/">Downloads</a></li>
 								<li>
 									<div class="header-icons">
 										<a class="shopping-cart" href="cart.html"><i class="fas fa-shopping-cart"></i></a>

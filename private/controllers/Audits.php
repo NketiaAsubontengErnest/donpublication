@@ -4,7 +4,7 @@
  * Subjects controller
  */
 class Audits extends Controller
-{   
+{
 
     function auditlist($id = null)
     {
@@ -17,19 +17,20 @@ class Audits extends Controller
         $data = array();
         $orders = new Order();
         $acti = new Activitylog();
+        $unret = new Uninvoicedret();
 
-        if (count($_POST) > 0 && isset($_POST['auditdone']) && Auth::access('g-account')) {
+        if (count($_POST) > 0 && isset($_POST['auditdone']) && Auth::access('auditor')) {
             $_POST['ordernum'] = $id;
             $_POST['AuditorId'] = Auth::getUsername();
-            $query = "UPDATE `orders` SET `audit`= :auditdone, `AuditorId` = :AuditorId WHERE `ordernumber` = :ordernum";           
+            $query = "UPDATE `orders` SET `audit`= :auditdone, `AuditorId` = :AuditorId WHERE `ordernumber` = :ordernum";
 
             $orders->query($query, $_POST);
         }
 
-        if (count($_POST) > 0 && isset($_POST['findings']) && Auth::access('g-account')) {
+        if (count($_POST) > 0 && isset($_POST['findings']) && Auth::access('auditor')) {
             $_POST['ordernum'] = $id;
             $_POST['AuditorId'] = Auth::getUsername();
-            $query = "UPDATE `orders` SET `audit`= :findings, `AuditorId` = :AuditorId WHERE `ordernumber` = :ordernum";           
+            $query = "UPDATE `orders` SET `audit`= :findings, `AuditorId` = :AuditorId WHERE `ordernumber` = :ordernum";
 
             $orders->query($query, $_POST);
         }
@@ -44,16 +45,18 @@ class Audits extends Controller
         }
 
         $disc = $id;
+        $dataret = $unret->where('ordernumber', $id);
 
         //this are for breadcrumb
         $crumbs[] = ['Dashboard', 'dashboard'];
         $crumbs[] = ['Books', ''];
         $actives = 'audits';
         $hiddenSearch = "";
-        if (Auth::access('g-account')) {
+        if (Auth::access('auditor')) {
             return $this->view('audits.auditlist', [
                 'rows' => $data,
                 'disc' => $disc,
+                'retrows' => $dataret,
                 'crumbs' => $crumbs,
                 'pager' => $pager,
                 'hiddenSearch' => $hiddenSearch,
@@ -129,7 +132,7 @@ class Audits extends Controller
         $crumbs[] = ['Books', ''];
         $actives = 'audits';
         $hiddenSearch = "";
-        if (Auth::access('g-account')) {
+        if (Auth::access('auditor')) {
             return $this->view('audits.officersalelist_unaudit', [
                 'rows' => $data,
                 'crumbs' => $crumbs,
@@ -164,7 +167,7 @@ class Audits extends Controller
 
         $arr['officerid'] = $id;
         $seasid = $_SESSION['seasondata'] != null ? $_SESSION['seasondata']->id : "";
-        
+
         if (isset($_GET['search_box'])) {
             $searching = '%' . $_GET['search_box'] . '%';
             $query = "SELECT orders.ordernumber, orders.invoiceno, orders.discount, orders.ordertype, orders.officerid, orders.verificid, orders.customerid, orders.issureid, orders.orderdate,  customers.customername FROM orders  JOIN customers  ON orders.customerid = customers.id WHERE orders.`audit` = 2 AND orders.`seasonid` ={$seasid} AND (orders.ordertype != '1' AND orders.officerid = :officerid) AND (orders.ordernumber LIKE :search OR customers.customername LIKE :search OR orders.invoiceno LIKE :search) GROUP BY orders.ordernumber LIMIT $limit OFFSET $offset";
@@ -183,7 +186,7 @@ class Audits extends Controller
         $crumbs[] = ['Books', ''];
         $actives = 'audits';
         $hiddenSearch = "";
-        if (Auth::access('g-account')) {
+        if (Auth::access('auditor')) {
             return $this->view('audits.officersalelist_findings', [
                 'rows' => $data,
                 'crumbs' => $crumbs,
@@ -238,7 +241,7 @@ class Audits extends Controller
         $crumbs[] = ['Books', ''];
         $actives = 'audits';
         $hiddenSearch = "";
-        if (Auth::access('g-account')) {
+        if (Auth::access('auditor')) {
             return $this->view('audits.officersalelist_audited', [
                 'rows' => $data,
                 'crumbs' => $crumbs,
@@ -273,6 +276,7 @@ class Audits extends Controller
 
         $user = new User();
         $payment = new Payment();
+        $unret = new Uninvoicedret();
 
         $seasid = $_SESSION['seasondata'] != null ? $_SESSION['seasondata']->id : "";
 
@@ -302,17 +306,19 @@ class Audits extends Controller
         if (isset($_GET['endDate'])) {
             $arrPay['endDate'] = $_GET['endDate'];
         }
-        $data = $payment->get_OfficTotalD($data,$seasid, $arrPay);
+        $data = $payment->get_OfficTotalD($data, $seasid, $arrPay);
         $data = $payment->get_OfficTotalDeptD($data, $seasid);
+        $dataret = $unret->where('ordernumber', $id);
 
         //this are for breadcrumb
         $crumbs[] = ['Dashboard', 'dashboard'];
         $crumbs[] = ['Payment', ''];
         $actives = 'audits';
         $hiddenSearch = "";
-        if (Auth::access('g-account')) {
+        if (Auth::access('auditor')) {
             return $this->view('audits.unaudited', [
                 'rows' => $data,
+                'retrows' => $dataret,
                 'crumbs' => $crumbs,
                 'pager' => $pager,
                 'hiddenSearch' => $hiddenSearch,
@@ -343,6 +349,7 @@ class Audits extends Controller
 
         $user = new User();
         $payment = new Payment();
+        $unret = new Uninvoicedret();
 
         $seasid = $_SESSION['seasondata'] != null ? $_SESSION['seasondata']->id : "";
 
@@ -372,17 +379,19 @@ class Audits extends Controller
         if (isset($_GET['endDate'])) {
             $arrPay['endDate'] = $_GET['endDate'];
         }
-        $data = $payment->get_OfficTotalD($data,$seasid, $arrPay);
+        $data = $payment->get_OfficTotalD($data, $seasid, $arrPay);
         $data = $payment->get_OfficTotalDeptD($data, $seasid);
+        $dataret = $unret->where('ordernumber', $id);
 
         //this are for breadcrumb
         $crumbs[] = ['Dashboard', 'dashboard'];
         $crumbs[] = ['Payment', ''];
         $actives = 'audits';
         $hiddenSearch = "";
-        if (Auth::access('g-account')) {
+        if (Auth::access('auditor')) {
             return $this->view('audits.findings', [
                 'rows' => $data,
+                'retrows' => $dataret,
                 'crumbs' => $crumbs,
                 'pager' => $pager,
                 'hiddenSearch' => $hiddenSearch,
@@ -450,7 +459,7 @@ class Audits extends Controller
         $crumbs[] = ['Payment', ''];
         $actives = 'audits';
         $hiddenSearch = "";
-        if (Auth::access('g-account')) {
+        if (Auth::access('auditor')) {
             return $this->view('audits.audited', [
                 'rows' => $data,
                 'crumbs' => $crumbs,

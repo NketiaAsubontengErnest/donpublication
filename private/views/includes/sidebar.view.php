@@ -95,7 +95,7 @@
                  </div>
              </li>
          <?php endif; ?>
-         <?php if (Auth::access('g-account')) : ?>
+         <?php if (Auth::access('auditor')) : ?>
              <li class="nav-item <?= $actives == 'audits' ? 'active' : '' ?>">
                  <a class="nav-link" data-toggle="collapse" href="#ui-markcon">
                      <i class="mdi mdi-book menu-icon"></i>
@@ -137,7 +137,7 @@
          <?php endif; ?>
 
 
-         <?php if (Auth::access('marketer') || Auth::access('verification')) : ?>
+         <?php if ((Auth::access('marketer') || Auth::access('verification')) && (Auth::getRank() != 'auditor')) : ?>
              <li class="nav-item <?= $actives == 'payments' ? 'active' : '' ?>">
                  <a class="nav-link" data-toggle="collapse" href="#report-element-" aria-expanded="false" aria-controls="report-element">
                      <i class="mdi mdi-chart-line menu-icon"></i>
@@ -191,7 +191,7 @@
              </li>
          <?php endif; ?>
 
-         <?php if (Auth::access('stores')) : ?>
+         <?php if (Auth::access('stores') && (Auth::getRank() != 'auditor')) : ?>
              <li class="nav-item <?= $actives == 'logs' ? 'active' : '' ?>">
                  <a class="nav-link" data-toggle="collapse" href="#logs">
                      <i class="mdi mdi-book-open-variant menu-icon"></i>

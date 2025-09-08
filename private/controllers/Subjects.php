@@ -160,13 +160,13 @@ class Subjects extends Controller
             $query = "SELECT books.* , SUM(orders.quantsupp) AS total_quantity_sold FROM books JOIN orders ON books.id = orders.bookid WHERE orders.verifiedDate BETWEEN :startdate AND :enddate GROUP BY books.id";
             $rows = $books->where_query($query, $arry);
         } else {
-            $rows = $books->findAll($limit, $offset);
+            $rows = $books->where_query("SELECT * FROM books ORDER BY subjectid ASC, typeid ASC, classid ASC LIMIT $limit OFFSET $offset ;", []);
         }
 
         if (isset($_POST['exportexl'])) {
             $fields = array('Book', 'Opening stock', 'Quantiry Added', 'Total Quantiry', 'Qty Supplied', 'Actual Supply', 'Sample Qty', 'Qty Returned', 'Qty Samp Returned', 'Closing Instock');
             $excelData = implode("\t", array_values($fields)) . "\n";
-            $rowsex = $books->findAll();
+            $rowsex = $books->where_query("SELECT * FROM books ORDER BY subjectid ASC, typeid ASC, classid ASC;", []);
             if ($rowsex) {
                 foreach ($rowsex as $row) {
                     try {
@@ -180,7 +180,7 @@ class Subjects extends Controller
                         esc(number_format($row->ttadded->ttAdded)),
                         esc(number_format($totalQty)),
                         esc(number_format($row->ttSupply->ttSupply)),
-                        esc(number_format($row->ttSupply->actualSupply)),
+                        esc(number_format($row->ttSupply->ttSupply - $row->ttreturns->ttreturns)),
                         esc(number_format($row->ttSampleSupply->ttSampleSupply)),
                         esc(number_format($row->ttreturns->ttreturns)),
                         esc(number_format($row->tt_samp_returns->tt_samp_returns)),

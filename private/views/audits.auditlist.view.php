@@ -189,9 +189,44 @@
                             </table>
                         </div>
                     </div>
+                    <h4 class="card-title">Non Invoiced Returns</h4>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <th>
+                                    Book
+                                </th>
+                                <th>
+                                    Ordered
+                                </th>
+                                <th>
+                                    Return
+                                </th>
+                            </thead>
+                            <tbody>
+                                <?php if ($retrows): ?>
+                                    <?php foreach ($retrows as $row): ?>
+                                        <tr>
+                                            <td>
+                                                <?= ucfirst(esc($row->books->level->class)) ?>
+                                                <?= ucfirst(esc($row->books->subject->subject)) ?>
+                                                <?= ucfirst(esc($row->books->booktype->booktype)) ?>
+                                            </td>
+                                            <td>
+                                                <?= $row->ordered ?>
+                                            </td>
+                                            <td>
+                                                <?= $row->quant ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <?php if ($rows[0]->audit != 1 ): ?>
+                            <?php if ($rows[0]->audit != 1): ?>
                                 <form action="" method="post">
                                     <button name="auditdone" value="1" class="btn btn-primary ">
                                         <i class="">Audit Done</i>
@@ -200,7 +235,7 @@
                             <?php endif; ?>
                         </div>
                         <div class="col-md-6">
-                            <?php if ($rows[0]->audit != 2 && $rows[0]->audit != 1 ): ?>
+                            <?php if ($rows[0]->audit != 2 && $rows[0]->audit != 1): ?>
                                 <form action="" method="post">
                                     <button name="findings" value="2" class="btn btn-warning float-end">
                                         <i class="">Audit with Findings</i>

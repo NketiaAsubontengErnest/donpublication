@@ -7,9 +7,7 @@ class Orders extends Controller
 {
     function index($id = null)
     {
-        if (!Auth::logged_in()) {
-            return $this->redirect('login');
-        }
+        if (!Auth::logged_in()) return $this->redirect('login');
         // Setting pagination
         $limit = 20;
         $pager = new Pager($limit);
@@ -60,9 +58,7 @@ class Orders extends Controller
     }
     function issued($id = null)
     {
-        if (!Auth::logged_in()) {
-            return $this->redirect('login');
-        }
+        if (!Auth::logged_in()) return $this->redirect('login');
         // Setting pagination
         $limit = 15;
         $pager = new Pager($limit);
@@ -106,9 +102,7 @@ class Orders extends Controller
 
     public function edit($id = null)
     {
-        if (!Auth::logged_in()) {
-            return $this->redirect('login');
-        }
+        if (!Auth::logged_in()) return $this->redirect('login');
         // Setting pagination
         $limit = 15;
         $pager = new Pager($limit);
@@ -166,9 +160,7 @@ class Orders extends Controller
 
     public function all_data($id = null)
     {
-        if (!Auth::logged_in()) {
-            return $this->redirect('login');
-        }
+        if (!Auth::logged_in()) return $this->redirect('login');
         // Setting pagination
         $limit = 15;
         $pager = new Pager($limit);
@@ -228,13 +220,7 @@ class Orders extends Controller
 
     public function placeorder($id = null)
     {
-        if (!Auth::logged_in()) {
-            return $this->redirect('login');
-        }
-        // Setting pagination
-        $limit = 15;
-        $pager = new Pager($limit);
-        $offset = $pager->offset;
+        if (!Auth::logged_in()) return $this->redirect('login');
 
         if (isset($_SESSION['ordernum'])) {
             unset($_SESSION['ordernum']);
@@ -244,7 +230,6 @@ class Orders extends Controller
         $books = new Book();
         $orders = new Order();
         $customer = new Customer();
-        $seas = new Season();
         $type = new Ordertype();
 
         $arr = array();
@@ -298,22 +283,47 @@ class Orders extends Controller
                 //get current Season
                 $seasid = $_SESSION['seasondata'] != null ? $_SESSION['seasondata']->id : "";
 
-                for ($count = 0; $count < count($_POST['hidden_book']); $count++) {
-                    $data = array(
-                        'bookid' => $_POST['hidden_book'][$count],
-                        'customerid' => $_POST['customerid'],
-                        'ordernumber' => $getordnum,
-                        'seasonid' => $seasid,
-                        'ordertype' => $_POST['ordertype'],
-                        'officerid' => Auth::getId(),
-                        'quantord' => $_POST['hidden_ord_quant'][$count]
-                    );
-                    $orders->insert($data);
+                if ($_SESSION['ordernum'] != null) {
+                    $query = 'SELECT ordernumber FROM `orders` WHERE `officerid` = :offiserid ORDER BY id DESC LIMIT 1 ';
+                    $ordedbooks = $orders->query($query, $arr);
+                    $countExistingBooks = 0;
+                    for ($count = 0; $count < count($_POST['hidden_book']); $count++) {
+                        if (in_array($_POST['hidden_book'][$count], array_column($ordedbooks, 'bookid'))) {
+                            $countExistingBooks++;
+                            continue;
+                        }
+                        $data = array(
+                            'bookid' => $_POST['hidden_book'][$count],
+                            'customerid' => $_POST['customerid'],
+                            'ordernumber' => $getordnum,
+                            'seasonid' => $seasid,
+                            'ordertype' => $_POST['ordertype'],
+                            'officerid' => Auth::getId(),
+                            'quantord' => $_POST['hidden_ord_quant'][$count]
+                        );
+                        $orders->insert($data);
+                    }
+                } else {
+                    for ($count = 0; $count < count($_POST['hidden_book']); $count++) {
+                        $data = array(
+                            'bookid' => $_POST['hidden_book'][$count],
+                            'customerid' => $_POST['customerid'],
+                            'ordernumber' => $getordnum,
+                            'seasonid' => $seasid,
+                            'ordertype' => $_POST['ordertype'],
+                            'officerid' => Auth::getId(),
+                            'quantord' => $_POST['hidden_ord_quant'][$count]
+                        );
+                        $orders->insert($data);
+                    }
                 }
 
                 if (isset($_SESSION['ordernum'])) {
                     unset($_SESSION['ordernum']);
                     $_SESSION['messsage'] = "Order Added Successfully";
+                    if ($countExistingBooks > 0) {
+                        $_SESSION['messsage'] = $countExistingBooks . " Book(s) already exist in this order. New books added successfully.";
+                    }
                     $_SESSION['status_code'] = "success";
                     $_SESSION['status_headen'] = "Good job!";
                     return $this->redirect('/orders/list/' . $id);
@@ -330,7 +340,7 @@ class Orders extends Controller
         }
 
         $custom = $customer->where('officerid', Auth::getId());
-        $queryBooks = "SELECT * FROM `books` WHERE `quantity` > :qunant;";
+        $queryBooks = "SELECT * FROM `books` WHERE `quantity` > :qunant ORDER BY subjectid ASC, typeid ASC, classid ASC;";
         $arrb['qunant'] = 0;
         $row = $books->where_query($queryBooks, $arrb);
 
@@ -346,7 +356,6 @@ class Orders extends Controller
             return $this->view('orders.placeorder', [
                 'errors' => $errors,
                 'crumbs' => $crumbs,
-                'pager' => $pager,
                 'hiddenSearch' => $hiddenSearch,
                 'typedata' => $typddata,
                 'cust' => $cust,
@@ -358,7 +367,6 @@ class Orders extends Controller
             $crumbs[] = ['Access Denied', ''];
             return $this->view('access-denied', [
                 'crumbs' => $crumbs,
-                'pager' => $pager,
                 'actives' => $actives
             ]);
         }
@@ -366,9 +374,7 @@ class Orders extends Controller
 
     public function applyprices($id = null)
     {
-        if (!Auth::logged_in()) {
-            return $this->redirect('login');
-        }
+        if (!Auth::logged_in()) return $this->redirect('login');
 
         // Setting pagination
         $limit = 15;
@@ -432,9 +438,7 @@ class Orders extends Controller
 
     public function groupsample($id = null)
     {
-        if (!Auth::logged_in()) {
-            return $this->redirect('login');
-        }
+        if (!Auth::logged_in()) return $this->redirect('login');
         // Setting pagination
         $limit = 15;
         $pager = new Pager($limit);
@@ -545,9 +549,7 @@ class Orders extends Controller
 
     function pending($id = null)
     {
-        if (!Auth::logged_in()) {
-            return $this->redirect('login');
-        }
+        if (!Auth::logged_in()) return $this->redirect('login');
         // Setting pagination
         $limit = 15;
         $pager = new Pager($limit);
@@ -601,9 +603,7 @@ class Orders extends Controller
 
     function pendingentry($id = null)
     {
-        if (!Auth::logged_in()) {
-            return $this->redirect('login');
-        }
+        if (!Auth::logged_in()) return $this->redirect('login');
         // Setting pagination
         $limit = 15;
         $pager = new Pager($limit);
@@ -617,36 +617,49 @@ class Orders extends Controller
         $seasid = $_SESSION['seasondata'] != null ? $_SESSION['seasondata']->id : "";
 
         if (isset($_GET['search_box'])) {
+
+            // $ordertype = 0;
+            // if (strtoupper($_GET['search_box'])  == 'CASH') {
+            //     $searching = '3';
+            //     $ordertype = 1;
+            // } elseif (strtoupper($_GET['search_box'])  == 'CREDIT') {
+            //     $searching = '2';
+            //     $ordertype = 1;
+            // } elseif (strtoupper($_GET['search_box'])  == 'SAMPLE') {
+            //     $searching = '1';
+            //     $ordertype = 1;
+            // }
+
             $searching = '%' . $_GET['search_box'] . '%';
             if (Auth::access('marketer')) {
-                $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE (orders.`accountofficer` = '' OR orders.`pricedate` = '') AND orders.`seasonid` ={$seasid} AND orders.verificid != '' AND orders.`officerid` =:officer  AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search) GROUP BY `ordernumber`";
+                $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE (orders.`accountofficer` = '' OR orders.`pricedate` = '') AND orders.`seasonid` ={$seasid} AND (orders.verificid != '' AND orders.`officerid` =:officer) AND orders.ordertype != 1 AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search) GROUP BY `ordernumber`";
             }
             if (Auth::access('verification')) {
-                $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE users.officer = :officer AND (orders.`accountofficer` = '' OR orders.`pricedate` = '') AND orders.`seasonid` ={$seasid} AND orders.verificid != '' AND orders.`issureid`!= '' AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search) GROUP BY `ordernumber`";
+                $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE users.officer = :officer AND (orders.`accountofficer` = '' OR orders.`pricedate` = '') AND orders.`seasonid` ={$seasid} AND (orders.verificid != '' AND orders.`issureid`!= '') AND orders.ordertype != 1 AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search) GROUP BY `ordernumber`";
             }
             if (Auth::access('g-account')) {
                 $arr = array();
-                $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE (orders.`accountofficer` = '' OR orders.`pricedate` = '') AND orders.`seasonid` ={$seasid} AND orders.verificid != '' AND orders.`issureid`!= '' AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search) GROUP BY `ordernumber`";
+                $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE (orders.`accountofficer` = '' OR orders.`pricedate` = '') AND orders.`seasonid` ={$seasid} AND (orders.verificid != '' AND orders.`issureid`!= '') AND orders.ordertype != 1 AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search) GROUP BY `ordernumber`";
             }
             $arr['search'] = $searching;
         } else {
             if (Auth::access('marketer')) {
-                $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE (orders.`accountofficer` = '' OR orders.`pricedate` = '') AND orders.`seasonid` ={$seasid} AND orders.verificid != '' AND orders.`officerid` =:officer AND (orders.retverquant < orders.quantsupp) GROUP BY `ordernumber`";
+                $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE (orders.`accountofficer` = '' OR orders.`pricedate` = '') AND orders.`seasonid` ={$seasid} AND (orders.verificid != '' AND orders.`officerid` =:officer) AND (orders.retverquant < orders.quantsupp) AND orders.ordertype != 1 GROUP BY `ordernumber`";
             }
             if (Auth::access('verification')) {
-                $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE users.officer = :officer AND (orders.`accountofficer` = '' OR orders.`pricedate` = '') AND orders.`seasonid` ={$seasid} AND orders.verificid != '' AND orders.`issureid`!= '' AND (orders.retverquant < orders.quantsupp) GROUP BY `ordernumber`";
+                $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE users.officer = :officer AND (orders.`accountofficer` = '' OR orders.`pricedate` = '') AND orders.`seasonid` ={$seasid} AND (orders.verificid != '' AND orders.`issureid`!= '') AND (orders.retverquant < orders.quantsupp) AND orders.ordertype != 1 GROUP BY `ordernumber`";
             }
 
             if (Auth::access('g-account')) {
                 $arr = array();
-                $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE (orders.`accountofficer` = '') AND orders.`seasonid` ={$seasid} AND orders.verificid != '' AND orders.`issureid`!= ''  AND (orders.retverquant < orders.quantsupp) GROUP BY `ordernumber`";
+                $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE (orders.`accountofficer` = '' AND orders.`seasonid` ={$seasid}) AND (orders.verificid != '' AND orders.`issureid`!= '') AND (orders.retverquant < orders.quantsupp) AND orders.ordertype != 1 GROUP BY `ordernumber`";
             }
         }
 
         $data = $orders->findAllDistinct($query, $arr, $limit, $offset);
 
         if (isset($_POST['exportexl'])) {
-            $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE (orders.`accountofficer` = '') AND orders.`seasonid` =:season AND orders.verificid != '' AND orders.`issureid`!= '' AND (orders.retverquant < orders.quantsupp) GROUP BY `ordernumber`";
+            $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE (orders.`accountofficer` = '' AND orders.`seasonid` =:season) AND orders.verificid != '' AND orders.`issureid`!= '' AND (orders.retverquant < orders.quantsupp) AND orders.ordertype != 1 GROUP BY `ordernumber`";
             $arr = array();
             $arr['season'] = $_SESSION['seasondata'] != null ? $_SESSION['seasondata']->id : "";
 
@@ -690,9 +703,7 @@ class Orders extends Controller
 
     function verified($id = null)
     {
-        if (!Auth::logged_in()) {
-            return $this->redirect('login');
-        }
+        if (!Auth::logged_in()) return $this->redirect('login');
         // Setting pagination
         $limit = 25;
         $pager = new Pager($limit);
@@ -785,16 +796,16 @@ class Orders extends Controller
 
     function list($id = null)
     {
-        if (!Auth::logged_in()) {
-            return $this->redirect('login');
-        }
+        if (!Auth::logged_in()) return $this->redirect('login');
         // Setting pagination
         $limit = 15;
         $pager = new Pager($limit);
         $offset = $pager->offset;
-        $data = array();
         $orders = new Order();
-        $arr = array();
+        $unret = new Uninvoicedret();
+        $arr = [];
+        $data = [];
+        $dataret = [];
 
         if (count($_POST) > 0) {
             $direct = "orders";
@@ -850,7 +861,7 @@ class Orders extends Controller
             $arr['searchuse'] = '%' . $_GET['search_box'] . '%';
             $query = "SELECT books.id AS bid, orders.*, levels.`class`, types.`booktype`, subjects.`subject` FROM `books` LEFT JOIN `orders` ON books.id = orders.bookid LEFT JOIN levels ON books.classid = levels.id LEFT JOIN types on books.typeid = types.id LEFT JOIN subjects ON books.classid = subjects.id WHERE ordernumber = :ordernumber AND (levels.`class` LIKE :searchuse OR types.`booktype` LIKE :searchuse OR subjects.`subject` LIKE :searchuse)";
         } else {
-            $query = "SELECT * FROM `orders` WHERE ordernumber = :ordernumber";
+            $query = "SELECT orders.* FROM orders JOIN books ON orders.bookid = books.id WHERE orders.ordernumber = :ordernumber ORDER BY books.subjectid ASC, books.typeid DESC, books.classid ASC;";
         }
 
         $data = $orders->where_query($query, $arr);
@@ -858,6 +869,7 @@ class Orders extends Controller
         if (!$data) {
             $data = array();
         }
+        $dataret = $unret->where('ordernumber', $id);
 
         //this are for breadcrumb
         $crumbs[] = ['Dashboard', 'dashboard'];
@@ -867,6 +879,7 @@ class Orders extends Controller
         if (Auth::access('marketer') || Auth::access('verification') || Auth::access('stores')) {
             return $this->view('orders.list', [
                 'rows' => $data,
+                'retrows' => $dataret,
                 'crumbs' => $crumbs,
                 'pager' => $pager,
                 'id' => $id,
@@ -885,16 +898,14 @@ class Orders extends Controller
 
     function print($id = null)
     {
-        if (!Auth::logged_in()) {
-            return $this->redirect('login');
-        }
+        if (!Auth::logged_in()) return $this->redirect('login');
 
         $data = array();
         $orders = new Order();
 
         $contents = '';
 
-        $data = $orders->where('ordernumber', $id);
+        $data = $orders->where_query("SELECT orders.* FROM orders JOIN books ON orders.bookid = books.id WHERE orders.ordernumber = :ordernumber ORDER BY books.subjectid ASC, books.typeid DESC, books.classid ASC;", ['ordernumber' => $id]);
         $ordtype = isset($data[0]->ordertypes->typename) ? esc($data[0]->ordertypes->typename) : "";
 
         $contents .= '
@@ -902,7 +913,10 @@ class Orders extends Controller
         			<td colspan="5" align="center" style="font-size:15px;"><b>LIST OF ' . $ordtype . '</b></td>
         		</tr>
         		<tr>
-                    <td width="50%">
+                    <td width="3%">
+                        <b>#</b>
+                    </td">
+                    <td width="47%">
                         <b>Book</b>
                     </td">
                     <td width="13%">
@@ -919,8 +933,9 @@ class Orders extends Controller
                     </td">
         		</tr>
         	';
-
+        $count = 0;
         foreach ($data as $row) {
+            $count++;
             $orderdate = $row->orderdate;
             $offs = '';
             if (isset($row->verificOff->firstname)) {
@@ -928,6 +943,7 @@ class Orders extends Controller
             }
             $contents .= '
                 <tr>
+                <td>' . $count . '</td>
                     <td>
                     '
                 . ucfirst(esc($row->books->level->class)) . " "
@@ -1075,30 +1091,32 @@ class Orders extends Controller
 
     function verifylist($id = null)
     {
-        if (!Auth::logged_in()) {
-            return $this->redirect('login');
-        }
-        // Setting pagination
+        if (!Auth::logged_in()) return $this->redirect('login');
         $limit = 15;
         $pager = new Pager($limit);
-        $data = array();
         $orders = new Order();
         $books = new Book();
+        $data = [];
+        $arr = [];
 
+        // Search functionality
         if (isset($_GET['search'])) {
             $searching = '%' . $_GET['search'] . '%';
-            $query = "SELECT * FROM `users` WHERE (`rank` =! 'agent') && (`firstname` LIKE :search || `lastname` LIKE :search || `othername` LIKE :search ||`user_id` LIKE :search ||`email` LIKE :search) ORDER BY id DESC";
+            $query = "SELECT * FROM `users` WHERE (`rank` != 'agent') AND (`firstname` LIKE :search OR `lastname` LIKE :search OR `othername` LIKE :search OR `user_id` LIKE :search OR `email` LIKE :search) ORDER BY id DESC";
             $arr['search'] = $searching;
             $data = $orders->query($query, $arr);
         } else {
-            $data = $orders->where('ordernumber', $id);
+            $data = $orders->where_query(
+                "SELECT orders.* FROM orders JOIN books ON orders.bookid = books.id WHERE orders.ordernumber = :ordernumber ORDER BY books.subjectid ASC, books.typeid DESC, books.classid ASC;",
+                ['ordernumber' => $id]
+            );
         }
 
-        if ((count($_POST) > 0 && Auth::access('stores')) || Auth::access('verification')) {
+        // Remove order
+        if (count($_POST) > 0 && (Auth::access('stores') || Auth::access('verification'))) {
             if (isset($_POST['removeorder'])) {
                 $bokid = $_POST['removeorder'];
-                $query = "DELETE FROM `orders` WHERE `id` =$bokid";
-                $orders->query($query);
+                $orders->query("DELETE FROM `orders` WHERE `id` = $bokid");
                 $_SESSION['messsage'] = "Order Removed Successfully";
                 $_SESSION['status_code'] = "success";
                 $_SESSION['status_headen'] = "Good job!";
@@ -1106,59 +1124,64 @@ class Orders extends Controller
             }
         }
 
-        if (count($_POST) > 0 && Auth::access('verification') && $_POST['verific'] ?? null === 'all') {
-            unset($_POST['verific']);
-
-            foreach ($data as $da) {
-                $_POST['verificid'] = Auth::getUsername();
-                $_POST['verifiedDate'] = date("Y-m-d");
-                $_POST['orderid'] = $da->id;
-                $arr['qty'] = $da->quantord;
-                $arr['bookid'] = $da->bookid;
-
-                if ($da->ordertype == 1) {
-                    $_POST['unitprice'] = '0.00';
-                    $_POST['accountofficer'] = Auth::getUsername();
-                    $_POST['pricedate'] = date("Y-m-d");
-                } else {
-                    $_POST['unitprice'] = '';
-                    $_POST['accountofficer'] = '';
-                    $_POST['pricedate'] = '';
+        // Bulk verification
+        if (count($_POST) > 0 && Auth::access('verification')) {
+            if (isset($_POST['verific']) && $_POST['verific'] === 'all') {
+                foreach ($data as $da) {
+                    if ($da->verificid == '') {
+                        $updateData = [
+                            'verificid' => Auth::getUsername(),
+                            'verifiedDate' => date("Y-m-d"),
+                            'orderid' => $da->id,
+                            'unitprice' => $da->ordertype == 1 ? '0.00' : $da->unitprice,
+                            'accountofficer' => $da->ordertype == 1 ? Auth::getUsername() : $da->accountofficer,
+                            'pricedate' => $da->ordertype == 1 ? date("Y-m-d") : $da->pricedate
+                        ];
+                        $bookUpdate = [
+                            'qty' => $da->quantord,
+                            'bookid' => $da->bookid
+                        ];
+                        $orders->query(
+                            "UPDATE `orders` SET `quantsupp`=`quantord`, `verificid`=:verificid, `verifiedDate`=:verifiedDate, `unitprice`=:unitprice, `accountofficer`=:accountofficer, `pricedate`=:pricedate WHERE `id`=:orderid",
+                            $updateData
+                        );
+                        $books->query(
+                            "UPDATE `books` SET `quantity` = `quantity` - :qty WHERE `id` = :bookid",
+                            $bookUpdate
+                        );
+                    }
                 }
-
-                if ($da->verificid == '') {
-                    $query = "UPDATE `orders` SET `quantsupp`=`quantord`,`verificid`=:verificid,`verifiedDate`=:verifiedDate, `unitprice`=:unitprice, `accountofficer`=:accountofficer, `pricedate`=:pricedate  WHERE `id` =:orderid";
-                    $query1 = 'UPDATE `books` SET `quantity` =  `quantity` - :qty WHERE `id` = :bookid';
-
-                    $orders->query($query, $_POST);
-                    $books->query($query1, $arr);
-                }
+                $_SESSION['messsage'] = "All Books Verified Successfully";
+                $_SESSION['status_code'] = "success";
+                $_SESSION['status_headen'] = "Good job!";
+                return $this->redirect("/orders/verifylist/" . $id);
             }
 
-            $_SESSION['messsage'] = "All Books Verified Successfully";
-            $_SESSION['status_code'] = "success";
-            $_SESSION['status_headen'] = "Good job!";
-            return $this->redirect("/orders/verifylist/" . $id);
-        } elseif (count($_POST) > 0 && Auth::access('verification')) {
-            $_POST['verificid'] = Auth::getUsername();
-            $_POST['verifiedDate'] = date("Y-m-d");
-            $arr['qty'] = $_POST['quantsupp'];
-            $arr['bookid'] = $_POST['bookid'];
-            unset($_POST['quantsupp']);
-            unset($_POST['bookid']);
-
-            $query = "UPDATE `orders` SET `quantsupp`=`quantord`,`verificid`=:verificid,`verifiedDate`=:verifiedDate WHERE `id` =:orderid";
-            $query1 = 'UPDATE `books` SET `quantity` =  `quantity` - :qty WHERE `id` = :bookid';
-
-            $books->query($query, $_POST);
-            $books->query($query1, $arr);
-
-            return $this->redirect("/orders/verifylist/" . $id);
+            // Single verification
+            if (isset($_POST['orderid'], $_POST['quantsupp'], $_POST['bookid'])) {
+                $updateData = [
+                    'verificid' => Auth::getUsername(),
+                    'verifiedDate' => date("Y-m-d"),
+                    'orderid' => $_POST['orderid']
+                ];
+                $bookUpdate = [
+                    'qty' => $_POST['quantsupp'],
+                    'bookid' => $_POST['bookid']
+                ];
+                $orders->query(
+                    "UPDATE `orders` SET `quantsupp`=`quantord`, `verificid`=:verificid, `verifiedDate`=:verifiedDate WHERE `id`=:orderid",
+                    $updateData
+                );
+                $books->query(
+                    "UPDATE `books` SET `quantity` = `quantity` - :qty WHERE `id` = :bookid",
+                    $bookUpdate
+                );
+                return $this->redirect("/orders/verifylist/" . $id);
+            }
         }
 
-        //this are for breadcrumb
-        $crumbs[] = ['Dashboard', 'dashboard'];
-        $crumbs[] = ['Books', ''];
+        // Breadcrumbs and view
+        $crumbs = [['Dashboard', 'dashboard'], ['Books', '']];
         $actives = 'order';
         $hiddenSearch = "yeap";
         if (Auth::access('marketer') || Auth::access('verification')) {
@@ -1181,9 +1204,7 @@ class Orders extends Controller
 
     function verify($id = null)
     {
-        if (!Auth::logged_in()) {
-            return $this->redirect('login');
-        }
+        if (!Auth::logged_in()) return $this->redirect('login');
         // Setting pagination
         $limit = 15;
         $pager = new Pager($limit);
@@ -1269,9 +1290,7 @@ class Orders extends Controller
 
     function salelist($id = null)
     {
-        if (!Auth::logged_in()) {
-            return $this->redirect('login');
-        }
+        if (!Auth::logged_in()) return $this->redirect('login');
         // Setting pagination
         $limit = 15;
         $pager = new Pager($limit);
@@ -1334,9 +1353,7 @@ class Orders extends Controller
 
     function officersalelist($id = null)
     {
-        if (!Auth::logged_in()) {
-            return $this->redirect('login');
-        }
+        if (!Auth::logged_in()) return $this->redirect('login');
         // Setting pagination
         $limit = 15;
         $pager = new Pager($limit);
@@ -1413,9 +1430,7 @@ class Orders extends Controller
 
     function salesent($id = null)
     {
-        if (!Auth::logged_in()) {
-            return $this->redirect('login');
-        }
+        if (!Auth::logged_in()) return $this->redirect('login');
         // Setting pagination
         $limit = 15;
         $pager = new Pager($limit);
@@ -1496,100 +1511,65 @@ class Orders extends Controller
 
     function special($id = null)
     {
-        if (!Auth::logged_in()) {
-            return $this->redirect('login');
-        }
-        // Setting pagination
-        $limit = 15;
-        $pager = new Pager($limit);
-        $offset = $pager->offset;
-        $data = array();
-        $customer = new Order();
-        $Customertypeassin = new Customertypeassin();
-        $customer = new Order();
-        $payment = new Payment();
-        $seasons = new Season();
+        if (!Auth::logged_in()) return $this->redirect('login');
 
-
-        //get Seasons
-        $seasid = $_SESSION['seasondata'] != null ? $_SESSION['seasondata']->id : "";
-
-        // Setting pagination
         $limit = 20;
         $pager = new Pager($limit);
         $offset = $pager->offset;
-        //$arr['officer'] = Auth::getId();
 
-        $officSpec = $Customertypeassin->where('verificationOffcer', Auth::getId());
+        $order = new Order();
+        $payment = new Payment();
+        $seasonId = $_SESSION['seasondata']->id ?? '';
+        $customertypeArray = [];
 
-        foreach ($officSpec as $object) {
-            $customertypeArray[] = $object->customertype;
+        $ctAssin = (new Customertypeassin())->where('verificationOffcer', Auth::getId());
+        foreach ($ctAssin as $type) {
+            $customertypeArray[] = $type->customertype;
         }
 
-
-        // Add conditions to the array if the customertype exists
-        if (in_array('agent', $customertypeArray)) {
-            $conditionsArray[] = "customers.custtype = 'agent'";
+        $conditions = [];
+        foreach (['agent', 'garris', 'booksh'] as $type) {
+            if (in_array($type, $customertypeArray)) {
+                $conditions[] = "customers.custtype = '$type'";
+            }
         }
 
-        if (in_array('garris', $customertypeArray)) {
-            $conditionsArray[] = "customers.custtype = 'garris'";
+        $where = count($conditions) > 0 ? '(' . implode(' OR ', $conditions) . ')' : '1=1';
+        $search = $_GET['search_box'] ?? '';
+        if ($search) {
+            $where .= " AND customers.customername LIKE '%$search%'";
         }
 
-        if (in_array('booksh', $customertypeArray)) {
-            $conditionsArray[] = "customers.custtype = 'booksh'";
-        }
+        $sql = "SELECT orders.customerid AS cid, orders.officerid, customers.customername, customers.custphone, 
+                   customers.custlocation, customers.custtype, customers.region, users.*
+            FROM orders 
+            LEFT JOIN customers ON orders.customerid = customers.id 
+            LEFT JOIN users ON orders.officerid = users.id
+            WHERE $where AND ordertype != '1' AND orders.seasonid = :season
+            GROUP BY customers.customername 
+            ORDER BY ID DESC 
+            LIMIT $limit OFFSET $offset";
 
-        // Join the conditions with 'AND'
-        $conditions = implode(' OR ', $conditionsArray);
+        $data = $order->query($sql, ['season' => $seasonId]);
+        $data = $payment->get_Total($data, $seasonId);
+        $data = $payment->get_TotalDept($data, $seasonId);
 
-        $conditions = "(" . $conditions . ")";
+        $crumbs = [['Dashboard', 'dashboard'], ['Books', '']];
+        $view = Auth::access('verification') || Auth::access('marketer') ? 'orders.special' : 'access-denied';
 
-        if (isset($_GET['search_box'])) {
-            // Add customername condition
-            $conditions .= " AND (customers.customername LIKE '%" . $_GET['search_box'] . "%')";
-        }
-
-        // Construct the SELECT query
-        $query = "SELECT orders.customerid AS cid, orders.officerid, customers.`customername`, customers.`custphone`, customers.`custlocation`, customers.`custtype`, customers.`region`, users.* FROM orders LEFT JOIN customers ON orders.customerid = customers.id LEFT JOIN users ON  orders.officerid = users.id";
-
-        if (!empty($conditions)) {
-            $query .= " WHERE " . $conditions . " AND (ordertype != '1') AND orders.`seasonid` ={$seasid}  GROUP BY customers.customername ORDER BY ID DESC LIMIT $limit OFFSET $offset";
-        }
-
-        $data = $customer->query($query);
-
-        $data = $payment->get_Total($data, $seasid);
-        $data = $payment->get_TotalDept($data, $seasid);
-
-        //this are for breadcrumb
-        $crumbs[] = ['Dashboard', 'dashboard'];
-        $crumbs[] = ['Books', ''];
-        $actives = 'order';
-        $hiddenSearch = "";
-        if (Auth::access('verification') || Auth::access('marketer')) {
-            return $this->view('orders.special', [
-                'rows' => $data,
-                'crumbs' => $crumbs,
-                'pager' => $pager,
-                'hiddenSearch' => $hiddenSearch,
-                'actives' => $actives
-            ]);
-        } else {
-            $crumbs[] = ['Access Denied', ''];
-            return $this->view('access-denied', [
-                'crumbs' => $crumbs,
-                'pager' => $pager,
-                'actives' => $actives
-            ]);
-        }
+        return $this->view($view, [
+            'rows' => $data,
+            'crumbs' => $crumbs,
+            'pager' => $pager,
+            'hiddenSearch' => '',
+            'actives' => 'order'
+        ]);
     }
+
 
     function listprice($id = null)
     {
-        if (!Auth::logged_in()) {
-            return $this->redirect('login');
-        }
+        if (!Auth::logged_in()) return $this->redirect('login');
         // Setting pagination
         $limit = 15;
         $pager = new Pager($limit);
@@ -1600,6 +1580,7 @@ class Orders extends Controller
         $payments = new Payment();
         $coust = new Customer();
         $tithe = new Tithe();
+        $unret = new Uninvoicedret();
 
         if (count($_POST) > 0 && isset($_POST['disc']) && Auth::access('verification')) {
             unset($_POST['custname']);
@@ -1725,6 +1706,8 @@ class Orders extends Controller
             $data = $orders->where('ordernumber', $id);
         }
 
+        $dataret = $unret->where('ordernumber', $id);
+
         $disc = $id;
 
         //this are for breadcrumb
@@ -1735,6 +1718,7 @@ class Orders extends Controller
         if (Auth::access('marketer') || Auth::access('verification')) {
             return $this->view('orders.listprice', [
                 'rows' => $data,
+                'retrows' => $dataret,
                 'disc' => $disc,
                 'crumbs' => $crumbs,
                 'pager' => $pager,
@@ -1753,9 +1737,7 @@ class Orders extends Controller
 
     function applyprice($id = null)
     {
-        if (!Auth::logged_in()) {
-            return $this->redirect('login');
-        }
+        if (!Auth::logged_in()) return $this->redirect('login');
         // Setting pagination
         $limit = 15;
         $pager = new Pager($limit);
@@ -1807,9 +1789,7 @@ class Orders extends Controller
     }
     function editprice($id = null)
     {
-        if (!Auth::logged_in()) {
-            return $this->redirect('login');
-        }
+        if (!Auth::logged_in()) return $this->redirect('login');
         // Setting pagination
         $limit = 15;
         $pager = new Pager($limit);
@@ -1877,9 +1857,7 @@ class Orders extends Controller
 
     function acceptprice($id = null)
     {
-        if (!Auth::logged_in()) {
-            return $this->redirect('login');
-        }
+        if (!Auth::logged_in()) return $this->redirect('login');
         // Setting pagination
         $limit = 15;
         $pager = new Pager($limit);

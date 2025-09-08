@@ -262,6 +262,42 @@
                         </div>
                     </div>
 
+                    <h4 class="card-title">Non Invoiced Returns</h4>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <th>
+                                    Book
+                                </th>
+                                <th>
+                                    Ordered
+                                </th>
+                                <th>
+                                    Return
+                                </th>
+                            </thead>
+                            <tbody>
+                                <?php if ($retrows): ?>
+                                    <?php foreach ($retrows as $row): ?>
+                                        <tr>
+                                            <td>
+                                                <?= ucfirst(esc($row->books->level->class)) ?>
+                                                <?= ucfirst(esc($row->books->subject->subject)) ?>
+                                                <?= ucfirst(esc($row->books->booktype->booktype)) ?>
+                                            </td>
+                                            <td>
+                                                <?= $row->ordered ?>
+                                            </td>
+                                            <td>
+                                                <?= $row->quant ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+
                 </div>
             </div>
         </div>

@@ -53,16 +53,22 @@
                                     ?>
                                         <tr>
                                             <td>
-                                                <?php if ((($row->quantsupp) == NULL || ($row->quantsupp) == 0)) : ?>
-                                                    <form method="POST">
-                                                        <input type="text" name="orderid" value="<?= esc($row->id) ?>" hidden>
-                                                        <input type="text" name="quantsupp" value="<?= esc($row->quantord) ?>" hidden>
-                                                        <input type="text" name="bookid" value="<?= esc($row->bookid) ?>" hidden>
-                                                        <button class="btn btn-primary btn-icon-text">
-                                                            <i class="ti-file btn-icon-prepend"></i>
-                                                            Verify
-                                                        </button>
-                                                    </form>
+                                                <?php if (($row->quantsupp == 0) || ($row->verificid == "")) : ?>
+                                                    <?php if ($row->verificid == ''): ?>
+                                                        <form method="POST">
+                                                            <input type="text" name="orderid" value="<?= esc($row->id) ?>" hidden>
+                                                            <input type="text" name="quantsupp" value="<?= esc($row->quantord) ?>" hidden>
+                                                            <input type="text" name="bookid" value="<?= esc($row->bookid) ?>" hidden>
+                                                            <button class="btn btn-primary btn-icon-text">
+                                                                <i class="ti-file btn-icon-prepend"></i>
+                                                                Verify
+                                                            </button>
+                                                        </form>
+                                                    <?php else:
+                                                        $countVerif++;
+                                                    ?>
+                                                        <i class="m-2 mdi mdi-check-all"> By <?= esc($row->verificOff->firstname) ?></i>
+                                                    <?php endif; ?>
                                                 <?php else :
                                                     $countVerif++;
                                                 ?>
@@ -82,28 +88,42 @@
                                                     Not Verified
                                                 <?php endif; ?>
                                             </td>
-
                                             <?php
-                                            $pricedate = $row->verifiedDate;
-
-                                            // Get today's date and the date of two days ago
+                                            $pricedate = date("Y-m-d", strtotime($row->verifiedDate)); // Format verifiedDate to Y-m-d
                                             $today = date("Y-m-d");
-                                            $two_days_ago = date("Y-m-d", strtotime("-7 days"));
 
-                                            if ((($row->quantsupp) == 0 || ($row->quantsupp) == NULL) || (($pricedate >= $two_days_ago && $pricedate <= $today))) : ?>
+                                            if ((($row->quantsupp) == 0 || ($row->quantsupp) == NULL) || ($pricedate == $today)) :
+                                            ?>
                                                 <td>
                                                     <a href="<?= HOME ?>/orders/verify/<?= $row->id ?>">
                                                         <i class="m-2 mdi mdi-auto-fix <?= $rows[0]->unitprice > 0 ? 'text-danger' : 'text-primary' ?>"> Edit</i>
                                                     </a>
                                                 </td>
+                                            <?php endif; ?>
+
+
+                                            <?php
+                                            $pricedate = date("Y-m-d", strtotime($row->verifiedDate));
+
+                                            // Get today's date and the date of two days ago
+                                            $today = date("Y-m-d");
+                                            $two_days_ago = date("Y-m-d", strtotime("-7 days"));
+
+
+                                            if ((($row->quantsupp) == 0 || ($row->quantsupp) == NULL) || (($pricedate >= $two_days_ago && $pricedate <= $today))) : ?>
+
                                                 <td>
                                                     <?php if ((($row->quantsupp) == 0 || ($row->quantsupp) == NULL)) : ?>
-                                                        <form id="deleteForm-<?= $row->id ?>" action="" method="POST">
-                                                            <button type="button" class="btn-sm btn-danger btn-rounded btn-icon" onclick="confirmDelete('<?= $row->id ?>', '<?= $bookname ?>')">
-                                                                <i class="mdi mdi-delete-forever"></i>
-                                                            </button>
-                                                            <input type="hidden" name="removeorder" value="<?= $row->id ?>">
-                                                        </form>
+                                                        <?php if ($row->verificid == ''): ?>
+                                                            <form id="deleteForm-<?= $row->id ?>" action="" method="POST">
+                                                                <button type="button" class="btn-sm btn-danger btn-rounded btn-icon" onclick="confirmDelete('<?= $row->id ?>', '<?= $bookname ?>')">
+                                                                    <i class="mdi mdi-delete-forever"></i>
+                                                                </button>
+                                                                <input type="hidden" name="removeorder" value="<?= $row->id ?>">
+                                                            </form>
+                                                        <?php else: ?>
+                                                            <i class="m-2 mdi mdi-close-box-off-outline text-danger"> Can't Delete Verified Item</i>
+                                                        <?php endif ?>
                                                     <?php endif ?>
                                                 </td>
                                             <?php

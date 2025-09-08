@@ -55,20 +55,43 @@
                                 <?php if ($rows): ?>
                                     <?php foreach ($rows as $row): ?>
                                         <tr>
-                                            <td>
-                                                <?php if (($row->retquant != 0) && ($row->retverofficer == '')): ?>
-                                                    <form method="POST">
-                                                        <input type="text" name="orderid" value="<?= esc($row->id) ?>" hidden>
-                                                        <input type="text" name="quantsupp" value="<?= esc($row->quantsupp) ?>" hidden>
-                                                        <input type="text" name="bookid" value="<?= esc($row->bookid) ?>" hidden>
-                                                        <input type="text" name="retquant" value="<?= esc($row->retquant) ?>" hidden>
-                                                        <button class="btn btn-primary btn-icon-text">
-                                                            <i class="ti-file btn-icon-prepend"></i>
-                                                            Verify
-                                                        </button>
-                                                    </form>
+                                            <td><?php
+
+                                                if (($row->retquant != 0)):
+
+                                                    $verifiedDate = new DateTime($row->verifiedDate);
+                                                    $now = new DateTime();
+                                                    $interval = $now->diff($verifiedDate);
+
+                                                    if ($interval->days <= 10):
+                                                        //if (true):
+                                                ?>
+                                                        <form method="POST">
+                                                            <input type="text" name="orderid" value="<?= esc($row->id) ?>" hidden>
+                                                            <input type="text" name="quantsupp" value="<?= esc($row->quantsupp) ?>" hidden>
+                                                            <input type="text" name="bookid" value="<?= esc($row->bookid) ?>" hidden>
+                                                            <input type="text" name="retquant" value="<?= esc($row->retquant) ?>" hidden>
+                                                            <button class="btn btn-success btn-icon-text" name="verifyret">
+                                                                <i class="ti-back-left btn-icon-prepend"></i>
+                                                                Verify
+                                                            </button>
+                                                        </form>
+                                                    <?php elseif (($row->retverofficer == '')): ?>
+                                                        <form method="POST">
+                                                            <input type="text" name="orderid" value="<?= esc($row->id) ?>" hidden>
+                                                            <input type="text" name="quantsupp" value="<?= esc($row->quantsupp) ?>" hidden>
+                                                            <input type="text" name="bookid" value="<?= esc($row->bookid) ?>" hidden>
+                                                            <input type="text" name="retquant" value="<?= esc($row->retquant) ?>" hidden>
+                                                            <button class="btn btn-primary btn-icon-text">
+                                                                <i class="ti-back-right btn-icon-prepend"></i>
+                                                                Verify
+                                                            </button>
+                                                        </form>
+                                                    <?php else: ?>
+                                                        <i class="m-2 mdi mdi-check-all">Done</i>
+                                                    <?php endif; ?>
                                                 <?php else: ?>
-                                                    <i class="m-2 mdi mdi-check-all">Done</i>
+                                                    <i class="m-2 mdi">No Return</i>
                                                 <?php endif; ?>
                                             </td>
                                             <td>
@@ -94,7 +117,7 @@
                                                 <?php elseif (($row->retverquantacc) > 0): ?>
                                                     Verified
                                                 <?php else: ?>
-                                                   Done
+                                                    Done
                                                 <?php endif; ?>
                                             </td>
                                             <td>

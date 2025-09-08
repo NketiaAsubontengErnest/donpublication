@@ -109,17 +109,19 @@ class Employee extends Controller
         if (!Auth::logged_in()) {
             return $this->redirect('login');
         }
-        
+
         $errors = array();
-        $customers = array();        
-        
+        $customers = array();
+
         $customer = new Customer();
         $orders = new Order();
         $payment = new Payment();
         $marketer = new User();
 
+        $seasid = $_SESSION['seasondata'] != null ? $_SESSION['seasondata']->id : "";
+
         if (count($_POST) > 0 && Auth::access('director')) {
-            if (isset($_POST['hidden_customer_id'])) {                
+            if (isset($_POST['hidden_customer_id'])) {
                 for ($count = 0; $count < count($_POST['hidden_customer_id']); $count++) {
                     $data = array(
                         'officerid' => $_POST['officerid'],
@@ -127,8 +129,8 @@ class Employee extends Controller
 
                     $ids = $_POST['hidden_customer_id'][$count];
                     $customer->update($ids, $data);
-                    $orders->query("UPDATE `orders` SET `officerid`=:officerid WHERE `customerid` = $ids", $data);
-                    $payment->query("UPDATE `payments` SET `officerid`=:officerid WHERE `customerid` = $ids", $data);
+                    $orders->query("UPDATE `orders` SET `officerid`=:officerid WHERE `seasonid` ={$seasid} AND `customerid` = $ids", $data);
+                    $payment->query("UPDATE `payments` SET `officerid`=:officerid WHERE `seasonid` ={$seasid} AND `customerid` = $ids", $data);
                 }
                 $_SESSION['messsage'] = "Customers Transfered Successfully";
                 $_SESSION['status_code'] = "success";

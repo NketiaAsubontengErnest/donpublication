@@ -70,8 +70,8 @@ class Auth
         }
         $logged_in_rank = $_SESSION['DONPUBUSER']->rank; //the rank for current user
         $RANK['director']      = ['director', 'g-account', 'account', 'verification', 'stores', 'marketer'];
-        $RANK['g-account']      = ['g-account', 'account', 'verification', 'stores', 'marketer', 'marketer'];
-        $RANK['auditor']      = ['g-account', 'account', 'verification', 'stores', 'marketer'];
+        $RANK['g-account']      = ['g-account', 'auditor', 'account', 'verification', 'stores', 'marketer', 'marketer'];
+        $RANK['auditor']      = ['auditor', 'account', 'verification', 'stores', 'marketer'];
         $RANK['account']      = ['account', 'verification', 'stores'];
         $RANK['verification']      = ['verification'];
         $RANK['stores']      = ['stores'];

@@ -655,13 +655,13 @@ class Customers extends Controller
 
         $use = $users->where('id', $id)[0]->firstname;
 
-        $row = $books->findAll($limit, $offset);
+        $row = $books->where_query("SELECT * FROM `books` ORDER BY books.subjectid ASC, books.typeid DESC, books.classid ASC LIMIT $limit OFFSET $offset;", []);
         $row = $books->get_Maketer_Sample_Supply($row, $id);
         $row = $books->get_Makerter_Supply($row, $id);
         $row = $books->get_Makerter_Returns($row, $id);
 
         if (isset($_POST['exportexl'])) {
-            $data1 = $books->findAll();
+            $data1 = $books->where_query("SELECT * FROM `books` ORDER BY books.subjectid ASC, books.typeid DESC, books.classid ASC;", []);
             $data1 = $books->get_Maketer_Sample_Supply($data1, $id);
             $data1 = $books->get_Makerter_Supply($data1, $id);
             $data1 = $books->get_Makerter_Returns($data1, $id);
@@ -712,12 +712,12 @@ class Customers extends Controller
 
         $books = new Book();
 
-        $row = $books->findAll($limit, $offset);
+        $row = $books->where_query("SELECT * FROM `books` ORDER BY books.subjectid ASC, books.typeid DESC, books.classid ASC LIMIT $limit OFFSET $offset;", []);
         $row = $books->get_Special_Supply($row, $_GET['type']);
         $row = $books->get_Special_Returns($row, $_GET['type']);
 
         if (isset($_POST['exportexl'])) {
-            $data1 = $books->findAll();
+            $data1 = $books->where_query("SELECT * FROM `books` ORDER BY books.subjectid ASC, books.typeid DESC, books.classid ASC;", []);
             $data1 = $books->get_Special_Supply($data1, $_GET['type']);
             $data1 = $books->get_Special_Returns($data1, $_GET['type']);
 

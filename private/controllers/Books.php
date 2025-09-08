@@ -48,7 +48,7 @@ class Books extends Controller
 
             $data = $book->findSearch($query, $arr);
         } else {
-            $data = $book->findAll($limit, $offset, 'DESC');
+            $data = $book->where_query("SELECT * FROM books ORDER BY subjectid DESC, typeid DESC, classid DESC LIMIT $limit OFFSET $offset ;", []);
         }
 
         //this are for breadcrumb
@@ -131,8 +131,8 @@ class Books extends Controller
         $offset = $pager->offset;
 
         $data = array();
-        $newstock = new Newstock();   
-        
+        $newstock = new Newstock();
+
         $seasid = $_SESSION['seasondata'] != null ? $_SESSION['seasondata']->id : "";
         $query = "SELECT * FROM `newstocks` WHERE `seasonid` =$seasid ORDER BY id DESC LIMIT $limit OFFSET $offset";
         $data = $newstock->findSearch($query);
@@ -160,7 +160,7 @@ class Books extends Controller
         $newstock = new Newstock();
         $season = new Season();
         $data['season'] = isset($season->selctingId()[0]->id) ? $season->selctingId()[0]->id : '';
-        
+
         $errors = array();
         if (count($_POST) > 0 && Auth::access('stores')) {
             if ($newstock->validate($_POST)) {
@@ -213,15 +213,15 @@ class Books extends Controller
             return $this->redirect('login');
         }
         $book = new Book();
-        
+
         $errors = array();
         if (count($_POST) > 0 && Auth::access('stores')) {
 
             $_POST['tithe'] = 0.1 * $_POST['profit'];
             $_POST['id'] = $id;
-            
+
             $query = "UPDATE `books` SET `profit`= :profit, `tithe`= :tithe WHERE `id` = :id;";
-            
+
             $book->query($query, $_POST);
 
             $_SESSION['messsage'] = "Book Profit & Tithe Set Successfully";

@@ -923,15 +923,17 @@ class Payments extends Controller
                 try {
                     $amountPaid = $_POST['amount'];
 
-                    $balance = $ttSales->totalNetSales - $_POST['amount'];
+                    $balance = number_format($ttSales->totalNetSales - $ttPayment->totalpayed - $amountPaid, 2);
 
                     $cust = $coust->where('id', $id)[0];
 
                     $custName = shortenText($cust->customername, 20);
 
+                    $amountPaid =  number_format($amountPaid, 2);
+
                     $message = "Hi $custName, GHS $amountPaid received. Balance: GHS $balance. Thank you for your payment.";
 
-                    //singlesendSms($cust->custphone, $message);
+                    singlesendSms($message, $cust->custphone);
                 } catch (Exception $e) {
                     // Handle exception if sending SMS fails
                     $_SESSION['messsage'] = "Payment recorded but SMS notification failed. Error: " . $e->getMessage();

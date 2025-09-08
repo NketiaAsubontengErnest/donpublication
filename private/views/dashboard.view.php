@@ -42,9 +42,17 @@
                 <div class="card card-dark-blue">
                     <div class="card-body">
                         <a href="<?= HOME ?>/subjects/summary" class="text-white" style="text-decoration: none;">
-                            <p class="mb-4">Total Books Supplied</p>
                             <?php try { ?>
-                                <p class="fs-30 mb-5"><?= esc(number_format($rows['order']->quantsupp - $rows['order']->retverquant)) ?></p>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p class="mb-4">General Supply</p>
+                                        <p class="fs-30 mb-5"><?= esc(number_format($rows['order']->quantsupp - $rows['order']->retverquant)) ?></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="mb-4">Actual Supply</p>
+                                        <p class="fs-30 mb-5"><?= esc(number_format($rows['order']->quantsupp - ($rows['order']->retverquant + $rows['sampleorder']->quantsuppSamp))) ?></p>
+                                    </div>
+                                </div>
                                 <div class="row">
                                     <div class="col-md-6">
                                         <p class="">Sample: <?= esc(number_format($rows['sampleorder']->quantsuppSamp)) ?></p>

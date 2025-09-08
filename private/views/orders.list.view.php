@@ -39,7 +39,7 @@
                     <?php endif ?>
 
                     <?php $this->view('patials/searcherbar', ['hiddenSearch' => $hiddenSearch]); ?>
-                    
+
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <thead>
@@ -90,7 +90,7 @@
                                             </td>
                                             <td>
                                                 <?php if (isset($row->verificOff->firstname)) : ?>
-                                                    <?= esc($row->verificOff->firstname) ?>                                                    
+                                                    <?= esc($row->verificOff->firstname) ?>
                                                 <?php else : ?>
                                                     <a href="<?= HOME ?>/orders/verifylist/<?= esc($id) ?>"></a>
                                                 <?php endif; ?>
@@ -98,9 +98,9 @@
                                             <td>
                                                 <?php if (($row->retquant) > 0 && (($row->retverquant) > 0)) : ?>
                                                     Verified, Returned Verified (<?= esc($row->retverofficer->firstname) ?>)
-                                                    <?php if($row->retquant > $row->retverquantacc):?>
+                                                    <?php if ($row->retquant > $row->retverquantacc): ?>
                                                         <a href="<?= HOME ?>/returns/retsedit/<?= $row->id ?>"> Edit</a>
-                                                    <?php endif;?>
+                                                    <?php endif; ?>
                                                 <?php elseif (($row->quantsupp) > 0 && (($row->retquant) > 0)) : ?>
                                                     Verified & Returned <a href="<?= HOME ?>/returns/retsedit/<?= $row->id ?>"> Edit</a>
                                                 <?php elseif (($row->quantsupp) > 0 || $row->verificid != '') : ?>
@@ -127,7 +127,7 @@
                                                     </td>
                                                     <td>
                                                         <form id="deleteForm-<?= $row->id ?>" action="" method="POST">
-                                                            <button type="button" class="btn-sm btn-danger btn-rounded btn-icon" onclick="confirmDelete('<?= $row->id?>', '<?=$bookname ?>')">
+                                                            <button type="button" class="btn-sm btn-danger btn-rounded btn-icon" onclick="confirmDelete('<?= $row->id ?>', '<?= $bookname ?>')">
                                                                 <i class="mdi mdi-delete-forever"></i>
                                                             </button>
                                                             <input type="hidden" name="removeorder" value="<?= $row->id ?>">
@@ -161,52 +161,93 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
-                <?php if ($rows) : ?>
-                    <?php if (Auth::getRank() == 'stores' && $rows[0]->issureid == '') : ?>
-                        <form action="" method="POST">
-                            <input type="text" name="use" valuel="use" hidden>
-                            <button class="m-2  btn btn-primary float-right">Done</button>
-                        </form>
-                    <?php endif ?>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <?php if ((Auth::getRank() == 'marketer' && $rows[0]->verificid != '') && $rows[0]->maketeraccept == '') : ?>
-                                <?php if ($countVerif == $count): ?>
-                                    <h4 class="m-2 text-danger">Please we wait for your acceptance</h4>
-                                    <form action="" method="POST">
-                                        <input type="text" name="accept" valuel="<?= $rows[0]->ordernumber ?>" hidden>
-                                        <button class="m-2 btn btn-success float-right"><i class="mdi mdi-cart"> Accept Verification</i></button>
-                                    </form>
-                                <?php endif ?>
-                            <?php else: ?>
-                                <?php if (Auth::getRank() == 'marketer'): ?>
-                                    <?php if ($countVerif == $count  && $rows[0]->maketeraccept != ''): ?>
-                                        <h4 class="m-2 text-danger">Thank you for Accepting. Do well to bring our invoice</h4>
+                    <?php if ($rows) : ?>
+                        <?php if (Auth::getRank() == 'stores' && $rows[0]->issureid == '') : ?>
+                            <form action="" method="POST">
+                                <input type="text" name="use" valuel="use" hidden>
+                                <button class="m-2  btn btn-primary float-right">Done</button>
+                            </form>
+                        <?php endif ?>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <?php if ((Auth::getRank() == 'marketer' && $rows[0]->verificid != '') && $rows[0]->maketeraccept == '') : ?>
+                                    <?php if ($countVerif == $count): ?>
+                                        <h4 class="m-2 text-danger">Please we wait for your acceptance</h4>
+                                        <form action="" method="POST">
+                                            <input type="text" name="accept" valuel="<?= $rows[0]->ordernumber ?>" hidden>
+                                            <button class="m-2 btn btn-success float-right"><i class="mdi mdi-cart"> Accept Verification</i></button>
+                                        </form>
+                                    <?php endif ?>
+                                <?php else: ?>
+                                    <?php if (Auth::getRank() == 'marketer'): ?>
+                                        <?php if ($countVerif == $count  && $rows[0]->maketeraccept != ''): ?>
+                                            <h4 class="m-2 text-danger">Thank you for Accepting. Do well to bring our invoice</h4>
+                                        <?php endif ?>
                                     <?php endif ?>
                                 <?php endif ?>
-                            <?php endif ?>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <?php if ((Auth::getRank() == 'stores' && $countVerif == 0)) : ?>
-                                <form action="" method="POST">
-                                    <input type="text" name="canc" valuel="<?= $rows[0]->ordernumber ?>" hidden>
-                                    <button class="m-2  btn btn-danger"><i class="mdi mdi-cart-off"> Cancel Order</i></button>
-                                </form>
-                            <?php endif ?>
-                            <?php if ((Auth::getRank() == 'marketer' && $countIssue == 0)) : ?>
-                                <form action="" method="POST">
-                                    <input type="text" name="canc" valuel="<?= $rows[0]->ordernumber ?>" hidden>
-                                    <button class="m-2  btn btn-danger float-right"><i class="mdi mdi-cart-off"> Cancel Order</i></button>
-                                </form>
-                            <?php endif ?>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <?php if ((Auth::getRank() == 'stores' && $countVerif == 0)) : ?>
+                                    <form action="" method="POST">
+                                        <input type="text" name="canc" valuel="<?= $rows[0]->ordernumber ?>" hidden>
+                                        <button class="m-2  btn btn-danger"><i class="mdi mdi-cart-off"> Cancel Order</i></button>
+                                    </form>
+                                <?php endif ?>
+                                <?php if ((Auth::getRank() == 'marketer' && $countIssue == 0)) : ?>
+                                    <form action="" method="POST">
+                                        <input type="text" name="canc" valuel="<?= $rows[0]->ordernumber ?>" hidden>
+                                        <button class="m-2  btn btn-danger float-right"><i class="mdi mdi-cart-off"> Cancel Order</i></button>
+                                    </form>
+                                <?php endif ?>
+                            </div>
                         </div>
-                    </div>
 
-                <?php endif ?>
+                    <?php endif ?>
+
+                    <h4 class="card-title">Non Invoiced Returns</h4>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <th>
+                                    Book
+                                </th>
+                                <th>
+                                    Ordered
+                                </th>
+                                <th>
+                                    Return
+                                </th>
+                            </thead>
+                            <tbody>
+                                <?php if ($retrows): ?>
+                                    <?php foreach ($retrows as $row): ?>
+                                        <tr>
+                                            <td>
+                                                <?= ucfirst(esc($row->books->level->class)) ?>
+                                                <?= ucfirst(esc($row->books->subject->subject)) ?>
+                                                <?= ucfirst(esc($row->books->booktype->booktype)) ?>
+                                            </td>
+                                            <td>
+                                                <?= $row->ordered ?>
+                                            </td>
+                                            <td>
+                                                <?= $row->quant ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
+
+
+
+
         </div>
     </div>
 
@@ -216,7 +257,7 @@
         function confirmDelete(orderId, bookname) {
             Swal.fire({
                 title: 'Are you sure?',
-                text: 'Do you want to delete '+ bookname +'? This action cannot be undone!',
+                text: 'Do you want to delete ' + bookname + '? This action cannot be undone!',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
