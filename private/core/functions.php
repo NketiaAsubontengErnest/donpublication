@@ -164,6 +164,11 @@ function get_date($date)
     return date("jS F, Y", strtotime($date));
 }
 
+function get_date_time($datetime)
+{
+    return date("jS F, Y (h:i A)", strtotime($datetime));
+}
+
 //Select correct customer type
 function get_Cust_type($typeName)
 {

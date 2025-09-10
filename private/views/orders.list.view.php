@@ -17,7 +17,7 @@
                                 <h4 class="card-title"> <b>Marketer:</b> <?= esc($rows[0]->makerter->firstname) ?> <?= esc($rows[0]->makerter->lastname) ?></h4>
                             </div>
                             <div class="col-md-2">
-                                <h4 class="card-title"> <b></b> <?= get_date(esc($rows[0]->orderdate)) ?></h4>
+                                <h4 class="card-title"> <b></b> <?= get_date_time(esc($rows[0]->orderdate)) ?></h4>
                             </div>
                         </div>
                     <?php else : ?>

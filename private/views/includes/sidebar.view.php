@@ -58,7 +58,7 @@
                  </div>
              </li>
          <?php endif; ?>
-         <?php if (Auth::access('marketer') || Auth::access('verification')) : ?>
+         <?php if (Auth::access('marketer') || Auth::access('verification') || Auth::getRank() == 'auditor') : ?>
              <li class="nav-item">
                  <a class="nav-link" data-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
                      <i class="mdi mdi-briefcase menu-icon"></i>
@@ -68,7 +68,7 @@
                  <div class="collapse" id="tables">
                      <ul class="nav flex-column sub-menu">
                          <li class="nav-item"> <a class="nav-link" href="<?= HOME ?>/orders/salesent">Sales Entry</a></li>
-                         <?php if (Auth::getRank() == 'verification' || Auth::getRank() == 'account'): ?>
+                         <?php if (Auth::getRank() == 'verification' || Auth::getRank() == 'account' || Auth::getRank() == 'auditor'): ?>
                              <li class="nav-item"> <a class="nav-link" href="<?= HOME ?>/orders/special">Special Entry</a></li>
                          <?php endif ?>
                          <li class="nav-item"> <a class="nav-link" href="<?= HOME ?>/payments">Payment Entry</a></li>
@@ -78,7 +78,7 @@
                  </div>
              </li>
          <?php endif; ?>
-         <?php if (Auth::access('director') || Auth::access('verification')) : ?>
+         <?php if (Auth::access('director') || Auth::getRank() == 'account') : ?>
              <li class="nav-item">
                  <a class="nav-link" data-toggle="collapse" href="#tabla" aria-expanded="false" aria-controls="tabla">
                      <i class="mdi mdi-briefcase menu-icon"></i>
@@ -137,7 +137,7 @@
          <?php endif; ?>
 
 
-         <?php if ((Auth::access('marketer') || Auth::access('verification')) && (Auth::getRank() != 'auditor')) : ?>
+         <?php if ((Auth::access('marketer') || Auth::access('verification'))) : ?>
              <li class="nav-item <?= $actives == 'payments' ? 'active' : '' ?>">
                  <a class="nav-link" data-toggle="collapse" href="#report-element-" aria-expanded="false" aria-controls="report-element">
                      <i class="mdi mdi-chart-line menu-icon"></i>

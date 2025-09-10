@@ -650,7 +650,7 @@ class Orders extends Controller
                 $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE users.officer = :officer AND (orders.`accountofficer` = '' OR orders.`pricedate` = '') AND orders.`seasonid` ={$seasid} AND (orders.verificid != '' AND orders.`issureid`!= '') AND (orders.retverquant < orders.quantsupp) AND orders.ordertype != 1 GROUP BY `ordernumber`";
             }
 
-            if (Auth::access('g-account')) {
+            if (Auth::access('auditor')) {
                 $arr = array();
                 $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE (orders.`accountofficer` = '' AND orders.`seasonid` ={$seasid}) AND (orders.verificid != '' AND orders.`issureid`!= '') AND (orders.retverquant < orders.quantsupp) AND orders.ordertype != 1 GROUP BY `ordernumber`";
             }
@@ -1039,7 +1039,7 @@ class Orders extends Controller
                         DATE
                     </td>                    
                     <td>
-                        ' . get_date($orderdate) . ' 
+                        ' . get_date_time($orderdate) . ' 
                     </td>                    
                 </tr>
                 <tr>
@@ -1131,7 +1131,7 @@ class Orders extends Controller
                     if ($da->verificid == '') {
                         $updateData = [
                             'verificid' => Auth::getUsername(),
-                            'verifiedDate' => date("Y-m-d"),
+                            'verifiedDate' => date("Y-m-d h:i:s"),
                             'orderid' => $da->id,
                             'unitprice' => $da->ordertype == 1 ? '0.00' : $da->unitprice,
                             'accountofficer' => $da->ordertype == 1 ? Auth::getUsername() : $da->accountofficer,
@@ -1161,7 +1161,7 @@ class Orders extends Controller
             if (isset($_POST['orderid'], $_POST['quantsupp'], $_POST['bookid'])) {
                 $updateData = [
                     'verificid' => Auth::getUsername(),
-                    'verifiedDate' => date("Y-m-d"),
+                    'verifiedDate' => date("Y-m-d h:i:s"),
                     'orderid' => $_POST['orderid']
                 ];
                 $bookUpdate = [
@@ -1227,7 +1227,7 @@ class Orders extends Controller
 
             if ($orders->validate($_POST)) {
                 $_POST['verificid'] = Auth::getUsername();
-                $_POST['verifiedDate'] = date("Y-m-d");
+                $_POST['verifiedDate'] = date("Y-m-d h:i:s");
 
                 $arr['id'] = $bookid;
                 if ($data[0]->quantsupp != null || $data[0]->quantsupp == 0) {
