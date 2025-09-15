@@ -168,10 +168,10 @@
                                                     $pricedate = $row->pricedate;
 
                                                     // Get today's date and the date of two days ago
-                                                    $today = date("Y-m-d");
-                                                    $two_days_ago = date("Y-m-d", strtotime("-2 days"));
+                                                    $today = date("Y-m-d h:i A");
+                                                    $two_days_ago = date("Y-m-d h:i A", strtotime("-2 days"));
 
-                                                    if (($row->unitprice == 0) || ($pricedate >= $two_days_ago && $pricedate <= $today)) : ?>
+                                                    if (($row->unitprice != 0 || $row->unitprice != null) || ($pricedate >= $two_days_ago && $pricedate <= $today)) : ?>
                                                         <td>
                                                             <a href="<?= HOME ?>/orders/applyprice/<?= $row->id ?>">
                                                                 <b><i class="m-2 mdi mdi-backup-restore <?= $row->unitprice > 0 ? 'text-danger' : 'text-success' ?>"> Add Price</i></b>

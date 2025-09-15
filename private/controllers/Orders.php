@@ -251,6 +251,8 @@ class Orders extends Controller
                 $ordnumn = "";
                 $arr['offiserid'] = Auth::getID();
 
+                $date = date("Y-m-d H:i:s");
+
                 if ($_SESSION['ordernum'] != null) {
                     $_POST['ordertype'] = $custs->ordertype;
                     $_POST['customerid'] = $custs->customerid;
@@ -284,11 +286,19 @@ class Orders extends Controller
                 $seasid = $_SESSION['seasondata'] != null ? $_SESSION['seasondata']->id : "";
 
                 if ($_SESSION['ordernum'] != null) {
-                    $query = 'SELECT ordernumber FROM `orders` WHERE `officerid` = :offiserid ORDER BY id DESC LIMIT 1 ';
-                    $ordedbooks = $orders->query($query, $arr);
+                    $query = 'SELECT * FROM `orders` WHERE `ordernumber` =:ordernumber AND `bookid` =:bookid';
                     $countExistingBooks = 0;
+
                     for ($count = 0; $count < count($_POST['hidden_book']); $count++) {
-                        if (in_array($_POST['hidden_book'][$count], array_column($ordedbooks, 'bookid'))) {
+                        $ordedbooks = $orders->query(
+                            $query,
+                            [
+                                'ordernumber' => $_SESSION['ordernum'],
+                                'bookid' => $_POST['hidden_book'][$count]
+                            ]
+                        );
+
+                        if ($ordedbooks) {
                             $countExistingBooks++;
                             continue;
                         }
@@ -299,6 +309,7 @@ class Orders extends Controller
                             'seasonid' => $seasid,
                             'ordertype' => $_POST['ordertype'],
                             'officerid' => Auth::getId(),
+                            'orderdate' => $date,
                             'quantord' => $_POST['hidden_ord_quant'][$count]
                         );
                         $orders->insert($data);
@@ -312,6 +323,7 @@ class Orders extends Controller
                             'seasonid' => $seasid,
                             'ordertype' => $_POST['ordertype'],
                             'officerid' => Auth::getId(),
+                            'orderdate' => $date,
                             'quantord' => $_POST['hidden_ord_quant'][$count]
                         );
                         $orders->insert($data);

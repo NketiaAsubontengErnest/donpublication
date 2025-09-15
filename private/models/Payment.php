@@ -17,6 +17,7 @@ class Payment extends Model
         'seasonid',
         'modeofpayment',
         'paymentdate',
+        'titheid',
     ];
 
     protected $beforeInset = [

@@ -913,7 +913,7 @@ class Payments extends Controller
             if ($payments->validate($_POST)) {
                 $progitData['seasonid'] = $_SESSION['seasondata']->id;
 
-                if ($progitData['tithe'] > 0) {
+                if ($progitData['tithe'] > 0 &&  $_POST['amount'] > $progitData['tithe']) {
                     $tithe->insert($progitData);
                     $_POST['titheid'] = $tithe->selctingId()[0]->id;
                 }
