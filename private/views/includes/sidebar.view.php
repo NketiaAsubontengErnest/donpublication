@@ -208,6 +208,23 @@
                  </div>
              </li>
          <?php endif; ?>
+
+         <?php if (Auth::access('developer')) : ?>
+             <li class="nav-item <?= $actives == 'operatiions' ? 'active' : '' ?>">
+                 <a class="nav-link" data-toggle="collapse" href="#ops">
+                     <i class="mdi mdi-book-open-variant menu-icon"></i>
+                     <span class="menu-title">Operation</span>
+                     <i class="menu-arrow"></i>
+                 </a>
+                 <div class="collapse <?= $actives == 'logs' ? 'show' : '' ?>" id="ops">
+                     <ul class="nav flex-column sub-menu">
+                         <li class="nav-item"> <a class="nav-link" href="<?= HOME ?>/payments/operations">Payments</a></li>
+                         <li class="nav-item"><a class="nav-link" href="<?= HOME ?>/payments/tithsoperations">Tiths</a></li>
+                     </ul>
+                 </div>
+             </li>
+         <?php endif; ?>
+
          <li class="nav-item <?= $actives == 'marketers' ? 'active' : '' ?>">
              <a class="nav-link" data-toggle="collapse" href="#ui-mark">
                  <i class="mdi mdi-cart menu-icon"></i>

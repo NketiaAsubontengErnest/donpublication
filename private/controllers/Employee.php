@@ -42,12 +42,12 @@ class Employee extends Controller
         if (isset($_GET['search_box'])) {
             $searching = '%' . $_GET['search_box'] . '%';
             $arr['search'] = $searching;
-            $query = "SELECT * FROM `users` WHERE `firstname` LIKE :search OR `lastname` LIKE :search OR `phone` LIKE :search OR `username` LIKE :search LIMIT $limit OFFSET $offset";
+            $query = "SELECT * FROM `users` WHERE (`firstname` LIKE :search OR `lastname` LIKE :search OR `phone` LIKE :search OR `username` LIKE :search) && rank != `developer` LIMIT $limit OFFSET $offset";
             $data = $employee->query($query, $arr);
             $data = $employee->get_Officer($data);
             $data = $employee->get_count_customer($data);
         } else {
-            $data = $employee->findAll($limit, $offset);
+            $data = $employee->where_query("SELECT * FROM `users` WHERE rank != :rank ORDER BY id DESC LIMIT $limit OFFSET $offset", ['rank' => 'developer']);
         }
 
 

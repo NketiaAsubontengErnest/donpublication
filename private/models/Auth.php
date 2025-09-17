@@ -69,13 +69,14 @@ class Auth
             return false;
         }
         $logged_in_rank = $_SESSION['DONPUBUSER']->rank; //the rank for current user
-        $RANK['director']      = ['director', 'g-account', 'account', 'verification', 'stores', 'marketer'];
+        $RANK['developer']      = ['developer', 'director', 'g-account', 'account', 'verification', 'stores', 'marketer'];
+        $RANK['director']       = ['director', 'g-account', 'account', 'verification', 'stores', 'marketer'];
         $RANK['g-account']      = ['g-account', 'auditor', 'account', 'verification', 'stores', 'marketer', 'marketer'];
-        $RANK['auditor']      = ['auditor', 'account', 'verification', 'stores', 'marketer'];
-        $RANK['account']      = ['account', 'verification', 'stores'];
-        $RANK['verification']      = ['verification'];
-        $RANK['stores']      = ['stores'];
-        $RANK['marketer']      = ['marketer'];
+        $RANK['auditor']        = ['auditor', 'account', 'verification', 'stores', 'marketer'];
+        $RANK['account']        = ['account', 'verification', 'stores'];
+        $RANK['verification']   = ['verification'];
+        $RANK['stores']         = ['stores'];
+        $RANK['marketer']       = ['marketer'];
 
         if (!isset($RANK[$logged_in_rank])) {
             return false;

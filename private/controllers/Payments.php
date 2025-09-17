@@ -73,6 +73,126 @@ class Payments extends Controller
         }
     }
 
+    function operations()
+    {
+        if (!Auth::logged_in()) {
+            return $this->redirect('login');
+        }
+        // Setting pagination
+        $limit = 15;
+        $pager = new Pager($limit);
+        $offset = $pager->offset;
+
+        $data = array();
+
+        $customer = new Order();
+        $payment = new Payment();
+        $seasons = new Season();
+        $tithe = new Tithe();
+        //get Seasons
+        $seasid = $_SESSION['seasondata'] != null ? $_SESSION['seasondata']->id : "";
+
+        if (isset($_POST['delete_payment'])) {
+            $delid = (int)$_POST['delete_payment'];
+            $getPayment = $payment->where('id', $delid);
+            if ($getPayment) {
+                if ($getPayment[0]->titheid != null && $getPayment[0]->titheid != "") {
+                    $tithe->delete($getPayment[0]->titheid);
+                }
+                $payment->delete($delid);
+                $this->redirect('payments/operations');
+            }
+        }
+
+        if (isset($_GET['search_box'])) {
+            $value = $_GET['search_box'];
+            if (is_numeric($value)) {
+                $data = $payment->where_query("SELECT payments.*, customers.customername, customers.custphone, customers.custlocation, users.firstname, users.lastname FROM `payments` LEFT JOIN customers ON payments.customerid = customers.id LEFT JOIN users ON payments.officerid = users.id WHERE (payments.`id` =:search OR payments.`reciept` =:search) AND payments.`seasonid` = :seasid ORDER BY payments.id DESC LIMIT $limit OFFSET $offset", ['search' => $value, 'seasid' => $seasid]);
+            } else {
+                $searching = '%' . $value . '%';
+                $data = $payment->where_query("SELECT payments.*, customers.customername, customers.custphone, customers.custlocation, users.firstname, users.lastname FROM `payments` LEFT JOIN customers ON payments.customerid = customers.id LEFT JOIN users ON payments.officerid = users.id WHERE (customers.`customername` LIKE :search OR customers.`custphone` LIKE :search OR users.firstname LIKE :search OR users.lastname LIKE :search) AND payments.`seasonid` = :seasid ORDER BY payments.id DESC LIMIT $limit OFFSET $offset", ['search' => $searching, 'seasid' => $seasid]);
+            }
+        } else {
+            $data = $payment->where_query("SELECT payments.*, customers.customername, customers.custphone, customers.custlocation, users.firstname, users.lastname FROM `payments` LEFT JOIN customers ON payments.customerid = customers.id LEFT JOIN users ON payments.officerid = users.id WHERE payments.`seasonid` = :seasid ORDER BY payments.id DESC LIMIT $limit OFFSET $offset", ['seasid' => $seasid]);
+        }
+        //this are for breadcrumb
+        $crumbs[] = ['Dashboard', 'dashboard'];
+        $crumbs[] = ['Payment', 'payments'];
+        $crumbs[] = ['Operations', ''];
+        $actives = 'operations';
+        $hiddenSearch = "";
+
+        if (Auth::access('account')) {
+            return $this->view('payments.operations', [
+                'rows' => $data,
+                'crumbs' => $crumbs,
+                'pager' => $pager,
+                'hiddenSearch' => $hiddenSearch,
+                'actives' => $actives
+            ]);
+        } else {
+            $crumbs[] = ['Access Denied', ''];
+            return $this->view('access-denied', [
+                'crumbs' => $crumbs,
+                'actives' => $actives
+            ]);
+        }
+    }
+
+    function tithsoperations()
+    {
+        if (!Auth::logged_in()) {
+            return $this->redirect('login');
+        }
+        // Setting pagination
+        $limit = 15;
+        $pager = new Pager($limit);
+        $offset = $pager->offset;
+
+        $data = array();
+
+        $tithe = new Tithe();
+        //get Seasons
+        $seasid = $_SESSION['seasondata'] != null ? $_SESSION['seasondata']->id : "";
+
+        if (isset($_POST['delete_payment'])) {
+            $delid = (int)$_POST['delete_payment'];
+
+            $tithe->delete($delid);
+        }
+
+        if (isset($_GET['search_box'])) {
+            $value = $_GET['search_box'];
+            $data = $tithe->where_query("SELECT tithes.*, customers.customername, customers.custphone, customers.custlocation FROM tithes LEFT JOIN customers ON tithes.custid = customers.id WHERE tithes.id =:search AND tithes.`seasonid` = :seasid ORDER BY tithes.id DESC LIMIT $limit OFFSET $offset", ['search' => $value, 'seasid' => $seasid]);
+        } else {
+            $data = $tithe->where_query("SELECT tithes.*, customers.customername, customers.custphone, customers.custlocation FROM tithes LEFT JOIN customers ON tithes.custid = customers.id WHERE tithes.`seasonid` = :seasid ORDER BY tithes.id DESC LIMIT $limit OFFSET $offset", ['seasid' => $seasid]);
+        }
+
+        //this are for breadcrumb
+        $crumbs[] = ['Dashboard', 'dashboard'];
+        $crumbs[] = ['Tithes', 'tithes'];
+        $crumbs[] = ['Operations', ''];
+        $actives = 'operations';
+        $hiddenSearch = "";
+
+        if (Auth::access('account')) {
+            return $this->view('payments.tithsoperations', [
+                'rows' => $data,
+                'crumbs' => $crumbs,
+                'pager' => $pager,
+                'hiddenSearch' => $hiddenSearch,
+                'actives' => $actives
+            ]);
+        } else {
+            $crumbs[] = ['Access Denied', ''];
+            return $this->view('access-denied', [
+                'crumbs' => $crumbs,
+                'actives' => $actives
+            ]);
+        }
+    }
+
+
     function genreports($id = null)
     {
         if (!Auth::logged_in()) {
