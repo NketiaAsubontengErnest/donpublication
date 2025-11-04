@@ -52,7 +52,17 @@
                                 <?php if ($rows) : ?>
                                     <?php foreach ($rows as $row) : ?>
                                         <tr>
-                                            <td><?= esc($row->level->class) ?></td>
+                                            <?php if (Auth::getRank() == 'stores'): ?>
+                                                <td>
+                                                    <a href="<?= HOME ?>/books/edit/<?= $row->id ?>">
+                                                        <?= esc($row->level->class) ?>
+                                                    </a>
+                                                </td>
+                                            <?php else: ?>
+                                                <td>
+                                                    <?= esc($row->level->class) ?>
+                                                </td>
+                                            <?php endif; ?>
                                             <td><?= esc($row->subject->subject) ?></td>
                                             <td><?= esc($row->booktype->booktype) ?></td>
                                             <td><label class="<?= $row->quantity <= $row->treshhold ? 'badge badge-danger' : '' ?>"><?= esc(number_format($row->quantity)) ?></label></td>

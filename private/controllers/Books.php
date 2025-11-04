@@ -65,6 +65,57 @@ class Books extends Controller
             'actives' => $actives
         ]);
     }
+
+    public function edit($id = null)
+    {
+        if (!Auth::logged_in()) {
+            return $this->redirect('login');
+        }
+        $book = new Book();
+        $newstock = new Newstock();
+        $season = new Season();
+        $data['season'] = isset($season->selctingId()[0]->id) ? $season->selctingId()[0]->id : '';
+
+        $errors = array();
+        if (count($_POST) > 0 && Auth::access('stores')) {
+            if ($newstock->validate($_POST)) {
+                $query = "UPDATE `books` SET `quantity`= :quantity WHERE `id` = :id;";
+                $_POST['id'] = $id;
+                $book->query($query, $_POST);
+
+                $_SESSION['messsage'] = "Book Quantity Update Successfully";
+                $_SESSION['status_code'] = "success";
+                $_SESSION['status_headen'] = "Good job!";
+                return $this->redirect('books/edit/' . $id);
+            }
+        }
+
+        $data = $book->where('id', $id)[0];
+
+        //this are for breadcrumb
+        $crumbs[] = ['Dashboard', 'dashboard'];
+        $crumbs[] = ['Books', 'books'];
+        $crumbs[] = ['Add Books', ''];
+
+        $actives = 'Books';
+        $hiddenSearch = "";
+        if (Auth::access('stores')) {
+            return $this->view('books.edit', [
+                'errors' => $errors,
+                'rows' => $data,
+                'hiddenSearch' => $hiddenSearch,
+                'crumbs' => $crumbs,
+                'actives' => $actives
+            ]);
+        } else {
+            $crumbs[] = ['Access Denied', ''];
+            return $this->view('access-denied', [
+                'crumbs' => $crumbs,
+                'actives' => $actives
+            ]);
+        }
+    }
+
     function reorderbooks($id = null)
     {
         if (!Auth::logged_in()) {
