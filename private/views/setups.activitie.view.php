@@ -26,7 +26,7 @@
                                                 <td>
                                                     <div class="row">
                                                         <div class="col-md-6 ">
-                                                            <a href="<?= HOME ?>/<?= $row->loclink ?>" class="btn btn-success btn-sm"><i class="mdi mdi-arrange-send-to-back"> Approve</i></a>
+                                                            <a href="<?= HOME ?>/<?= $row->loclink ?>" class="btn btn-success btn-sm" target="_blank"><i class="mdi mdi-arrange-send-to-back"> Approve</i></a>
                                                         </div>
                                                         <div class="col-md-6">
                                                             <form method="POST">

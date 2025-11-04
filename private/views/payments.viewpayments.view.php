@@ -118,7 +118,7 @@
                                                     <?php endif ?>
 
 
-                                                    <?php if (Auth::access('g-account') && $row->updateamount != 0) : ?>
+                                                    <?php if (Auth::access('g-account') && $row->updateamount != NULL) : ?>
                                                         <a href="<?= HOME ?>/payments/approveedit/<?= $row->id ?>">
                                                             <i class="m-2"> Confirm Edit</i>
                                                         </a>

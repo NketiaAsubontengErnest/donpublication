@@ -7,7 +7,7 @@
                     <div class="row m-2">
                         <h4 class="card-title">All Payments </h4>
                     </div>
-                    <?php 
+                    <?php
                     $payments = 0;
                     ?>
 
@@ -48,6 +48,9 @@
                                     <th>
                                         Amount
                                     </th>
+                                    <th>
+                                        Date Recorded
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -61,7 +64,7 @@
                                                 <?= esc($row->customers->customername) ?>
                                             </td>
                                             <td>
-                                                <?= esc($row->marketer->firstname)?> <?= esc($row->marketer->lastname)?>
+                                                <?= esc($row->marketer->firstname) ?> <?= esc($row->marketer->lastname) ?>
                                             </td>
                                             <td>
                                                 <?= esc($row->reciept) ?>
@@ -76,11 +79,16 @@
 
                                             <td>
                                                 GHS <?= esc(number_format($row->amount, 2)) ?>
-                                                <?php $payments += $row->amount?>
-                                                <?php if ($row->updateamount != 0) : ?>
+                                                <?php $payments += $row->amount ?>
+                                                <?php if ($row->updateamount != NULL) : ?>
                                                     Edited to <?= esc(number_format($row->updateamount, 2)) ?>
                                                 <?php endif; ?>
                                             </td>
+
+                                            <td>
+                                                <?= esc(get_date($row->datepaid)) ?>
+                                            </td>
+
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php else : ?>
@@ -93,10 +101,15 @@
                             </tbody>
                         </table>
                     </div>
+                    <?php if (Auth::access('account')) : ?>
+                        <form method="post">
+                            <button name="exportexl" class="btn btn-success">Export to Excel</button>
+                        </form>
+                    <?php endif; ?>
                 </div>
                 <?php $pager->display($rows ? count($rows) : 0); ?>
             </div>
-            
+
         </div>
         <div class="row">
             <div class="col-lg-12 ">
@@ -114,7 +127,7 @@
                             <div class="col-md-4">
                             </div>
                             <div class="col-md-4">
-                            <h4>GHS <?=number_format($payments, 2)?></h4>
+                                <h4>GHS <?= number_format($payments, 2) ?></h4>
                             </div>
                         </div>
                     </div>

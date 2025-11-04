@@ -569,22 +569,23 @@ class Orders extends Controller
         $data = array();
         $orders = new Order();
         $arr = array();
+        $season = $_SESSION['seasondata'] != null ? $_SESSION['seasondata']->id : "";
 
         if (isset($_GET['search_box'])) {
             $searching = '%' . $_GET['search_box'] . '%';
             if (Auth::access('marketer')) {
-                $query = "SELECT orders.*, customers.customername FROM `orders` LEFT JOIN customers ON orders.customerid = customers.id  WHERE orders.`verificid` = '' AND `officerid` = " . Auth::getId() . " AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search) GROUP BY `ordernumber`";
+                $query = "SELECT orders.*, customers.customername FROM `orders` LEFT JOIN customers ON orders.customerid = customers.id  WHERE (orders.`verificid` = '' AND `officerid` = " . Auth::getId() . " AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search)) AND  seasonid = {$season} GROUP BY `ordernumber`";
             }
             if (Auth::access('verification')) {
-                $query = "SELECT orders.*, customers.customername FROM `orders` LEFT JOIN customers ON orders.customerid = customers.id  WHERE orders.`verificid` = '' AND orders.`issureid`!= '' AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search) GROUP BY `ordernumber`";
+                $query = "SELECT orders.*, customers.customername FROM `orders` LEFT JOIN customers ON orders.customerid = customers.id  WHERE (orders.`verificid` = '' AND orders.`issureid`!= '' AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search)) AND  seasonid = {$season} GROUP BY `ordernumber`";
             }
             $arr['search'] = $searching;
         } else {
             if (Auth::access('marketer')) {
-                $query = "SELECT * FROM `orders` WHERE `verificid` = '' AND `officerid` = " . Auth::getId() . " GROUP BY `ordernumber`";
+                $query = "SELECT * FROM `orders` WHERE (`verificid` = '' AND `officerid` = " . Auth::getId() . ") AND  seasonid = {$season} GROUP BY `ordernumber`";
             }
             if (Auth::access('verification')) {
-                $query = "SELECT * FROM `orders` WHERE `verificid` = '' AND orders.`issureid`!= '' GROUP BY `ordernumber`";
+                $query = "SELECT * FROM `orders` WHERE (`verificid` = '' AND orders.`issureid`!= '') AND  seasonid = {$season} GROUP BY `ordernumber`";
             }
         }
 
@@ -644,31 +645,31 @@ class Orders extends Controller
 
             $searching = '%' . $_GET['search_box'] . '%';
             if (Auth::access('marketer')) {
-                $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE (orders.`accountofficer` = '' OR orders.`pricedate` = '') AND orders.`seasonid` ={$seasid} AND (orders.verificid != '' AND orders.`officerid` =:officer) AND orders.ordertype != 1 AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search) GROUP BY `ordernumber`";
+                $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE (orders.`accountofficer` = '' OR orders.`pricedate` = '') AND orders.`seasonid` ={$seasid} AND (orders.verificid != '' AND orders.`officerid` =:officer) AND orders.ordertype != 1 AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search) GROUP BY `ordernumber` LIMIT $limit OFFSET $offset ;";
             }
             if (Auth::access('verification')) {
-                $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE users.officer = :officer AND (orders.`accountofficer` = '' OR orders.`pricedate` = '') AND orders.`seasonid` ={$seasid} AND (orders.verificid != '' AND orders.`issureid`!= '') AND orders.ordertype != 1 AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search) GROUP BY `ordernumber`";
+                $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE users.officer = :officer AND (orders.`accountofficer` = '' OR orders.`pricedate` = '') AND orders.`seasonid` ={$seasid} AND (orders.verificid != '' AND orders.`issureid`!= '') AND orders.ordertype != 1 AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search) GROUP BY `ordernumber` LIMIT $limit OFFSET $offset ;";
             }
-            if (Auth::access('g-account')) {
+            if (Auth::access('account')) {
                 $arr = array();
-                $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE (orders.`accountofficer` = '' OR orders.`pricedate` = '') AND orders.`seasonid` ={$seasid} AND (orders.verificid != '' AND orders.`issureid`!= '') AND orders.ordertype != 1 AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search) GROUP BY `ordernumber`";
+                $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE (orders.`accountofficer` = '' OR orders.`pricedate` = '') AND orders.`seasonid` ={$seasid} AND (orders.verificid != '' AND orders.`issureid`!= '') AND orders.ordertype != 1 AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search) GROUP BY `ordernumber` LIMIT $limit OFFSET $offset ;";
             }
             $arr['search'] = $searching;
         } else {
             if (Auth::access('marketer')) {
-                $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE (orders.`accountofficer` = '' OR orders.`pricedate` = '') AND orders.`seasonid` ={$seasid} AND (orders.verificid != '' AND orders.`officerid` =:officer) AND (orders.retverquant < orders.quantsupp) AND orders.ordertype != 1 GROUP BY `ordernumber`";
+                $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE (orders.`accountofficer` = '' OR orders.`pricedate` = '') AND orders.`seasonid` ={$seasid} AND (orders.verificid != '' AND orders.`officerid` =:officer) AND (orders.retverquant < orders.quantsupp) AND orders.ordertype != 1 GROUP BY `ordernumber` LIMIT $limit OFFSET $offset ;";
             }
             if (Auth::access('verification')) {
-                $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE users.officer = :officer AND (orders.`accountofficer` = '' OR orders.`pricedate` = '') AND orders.`seasonid` ={$seasid} AND (orders.verificid != '' AND orders.`issureid`!= '') AND (orders.retverquant < orders.quantsupp) AND orders.ordertype != 1 GROUP BY `ordernumber`";
+                $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE users.officer = :officer AND (orders.`accountofficer` = '' OR orders.`pricedate` = '') AND orders.`seasonid` ={$seasid} AND (orders.verificid != '' AND orders.`issureid`!= '') AND (orders.retverquant < orders.quantsupp) AND orders.ordertype != 1 GROUP BY `ordernumber` LIMIT $limit OFFSET $offset ;";
             }
 
-            if (Auth::access('auditor')) {
+            if (Auth::access('account')) {
                 $arr = array();
-                $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE (orders.`accountofficer` = '' AND orders.`seasonid` ={$seasid}) AND (orders.verificid != '' AND orders.`issureid`!= '') AND (orders.retverquant < orders.quantsupp) AND orders.ordertype != 1 GROUP BY `ordernumber`";
+                $query = "SELECT orders.*, users.officer FROM orders LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE orders.accountofficer = '' AND orders.seasonid = {$seasid} AND orders.verificid != '' AND orders.issureid != '' AND orders.retverquant < orders.quantsupp AND orders.ordertype != 1 GROUP BY `ordernumber` LIMIT $limit OFFSET $offset ;";
             }
         }
 
-        $data = $orders->findAllDistinct($query, $arr, $limit, $offset);
+        $data = $orders->findAllDistinct($query, $arr);
 
         if (isset($_POST['exportexl'])) {
             $query = "SELECT orders.*, users.officer FROM `orders` LEFT JOIN users ON orders.officerid = users.id LEFT JOIN customers ON orders.customerid = customers.id WHERE (orders.`accountofficer` = '' AND orders.`seasonid` =:season) AND orders.verificid != '' AND orders.`issureid`!= '' AND (orders.retverquant < orders.quantsupp) AND orders.ordertype != 1 GROUP BY `ordernumber`";
@@ -724,6 +725,7 @@ class Orders extends Controller
         $orders = new Order();
         $arr = array();
         $query = '';
+        $season = $_SESSION['seasondata'] != null ? $_SESSION['seasondata']->id : "";
 
 
         if (isset($_GET['search_box'])) {
@@ -744,39 +746,39 @@ class Orders extends Controller
 
             if ($ordertype == 1) {
                 if (Auth::access('marketer')) {
-                    $query = "SELECT orders.*, customers.customername FROM `orders` LEFT JOIN customers ON orders.customerid = customers.id  WHERE orders.`verificid` != '' AND `verifiedDate` != '' AND `officerid` = " . Auth::getId() . " AND (orders.ordertype = :search) GROUP BY `ordernumber`";
+                    $query = "SELECT orders.*, customers.customername FROM `orders` LEFT JOIN customers ON orders.customerid = customers.id  WHERE (orders.`verificid` != '' AND `verifiedDate` != '' AND `officerid` = " . Auth::getId() . " AND (orders.ordertype = :search)) AND seasonid = {$season} GROUP BY `ordernumber`";
                 }
                 if (Auth::access('verification')) {
-                    $query = "SELECT orders.*, customers.customername FROM `orders` LEFT JOIN customers ON orders.customerid = customers.id  WHERE orders.`verificid` != '' AND `verifiedDate` != ''  AND (orders.ordertype = :search) GROUP BY `ordernumber`";
+                    $query = "SELECT orders.*, customers.customername FROM `orders` LEFT JOIN customers ON orders.customerid = customers.id  WHERE (orders.`verificid` != '' AND `verifiedDate` != ''  AND (orders.ordertype = :search)) AND seasonid = {$season} GROUP BY `ordernumber`";
                 }
                 if (Auth::access('g-account')) {
-                    $query = "SELECT orders.*, customers.customername FROM `orders` LEFT JOIN customers ON orders.customerid = customers.id  WHERE orders.`verificid` != '' AND `verifiedDate` != '' AND  (orders.ordertype = :search) GROUP BY `ordernumber`";
+                    $query = "SELECT orders.*, customers.customername FROM `orders` LEFT JOIN customers ON orders.customerid = customers.id  WHERE (orders.`verificid` != '' AND `verifiedDate` != '' AND  (orders.ordertype = :search)) AND seasonid = {$season} GROUP BY `ordernumber`";
                 }
             } else {
 
                 if (Auth::access('marketer')) {
-                    $query = "SELECT orders.*, customers.customername FROM `orders` LEFT JOIN customers ON orders.customerid = customers.id  WHERE orders.`verificid` != '' AND `verifiedDate` != '' AND `officerid` = " . Auth::getId() . " AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search OR orders.ordertype LIKE :search) GROUP BY `ordernumber`";
+                    $query = "SELECT orders.*, customers.customername FROM `orders` LEFT JOIN customers ON orders.customerid = customers.id  WHERE (orders.`verificid` != '' AND `verifiedDate` != '' AND `officerid` = " . Auth::getId() . " AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search OR orders.ordertype LIKE :search)) AND seasonid = {$season} GROUP BY `ordernumber`";
                 }
                 if (Auth::access('verification')) {
-                    $query = "SELECT orders.*, customers.customername FROM `orders` LEFT JOIN customers ON orders.customerid = customers.id  WHERE orders.`verificid` != '' AND `verifiedDate` != '' AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search OR orders.ordertype LIKE :search) GROUP BY `ordernumber`";
+                    $query = "SELECT orders.*, customers.customername FROM `orders` LEFT JOIN customers ON orders.customerid = customers.id  WHERE (orders.`verificid` != '' AND `verifiedDate` != '' AND (customers.customername LIKE :search OR orders.ordernumber LIKE :search OR orders.ordertype LIKE :search)) AND seasonid = {$season} GROUP BY `ordernumber`";
                 }
                 if (Auth::access('g-account')) {
-                    $query = "SELECT orders.*, customers.customername FROM `orders` LEFT JOIN customers ON orders.customerid = customers.id  WHERE orders.`verificid` != '' AND `verifiedDate` != '' AND  (customers.customername LIKE :search OR orders.ordernumber LIKE :search OR orders.ordertype LIKE :search) GROUP BY `ordernumber`";
+                    $query = "SELECT orders.*, customers.customername FROM `orders` LEFT JOIN customers ON orders.customerid = customers.id  WHERE (orders.`verificid` != '' AND `verifiedDate` != '' AND  (customers.customername LIKE :search OR orders.ordernumber LIKE :search OR orders.ordertype LIKE :search)) AND seasonid = {$season} GROUP BY `ordernumber`";
                 }
             }
 
             $arr['search'] = $searching;
         } else {
             if (Auth::access('marketer')) {
-                $query = "SELECT * FROM `orders` WHERE verificid != '' AND `verifiedDate` != '' AND `officerid` = " . Auth::getId() . " GROUP BY `ordernumber`";
+                $query = "SELECT * FROM `orders` WHERE verificid != '' AND `verifiedDate` != '' AND `officerid` = " . Auth::getId() . " AND seasonid = {$season} GROUP BY `ordernumber`";
             }
             if (Auth::access('verification')) {
                 $arr['verificid'] = Auth::getUsername();
-                $query = "SELECT * FROM `orders` WHERE verificid != '' AND `verifiedDate` != '' AND `verificid` = :verificid GROUP BY `ordernumber`";
+                $query = "SELECT * FROM `orders` WHERE verificid != '' AND `verifiedDate` != '' AND `verificid` = :verificid AND seasonid = {$season} GROUP BY `ordernumber`";
             }
             if (Auth::access('account')) {
                 $arr = array();
-                $query = "SELECT * FROM `orders` WHERE verificid != '' AND `verifiedDate` != '' GROUP BY `ordernumber`";
+                $query = "SELECT * FROM `orders` WHERE verificid != '' AND `verifiedDate` != '' AND seasonid = {$season} GROUP BY `ordernumber`";
             }
         }
         $data = $orders->findAllDistinct($query, $arr, $limit, $offset, rotations: "DESC");

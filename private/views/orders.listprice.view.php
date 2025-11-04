@@ -190,7 +190,7 @@
                                             <?php else : ?>
                                                 <td></td>
                                             <?php endif; ?>
-                                            <?php if (Auth::getRank() == 'director') : ?>
+                                            <?php if (Auth::access('director')) : ?>
                                                 <td>
                                                     <a href="<?= HOME ?>/orders/all_data/<?= $row->id ?>">
                                                         <i class="m-2 mdi mdi-backup-restore">Edit All Data</i>

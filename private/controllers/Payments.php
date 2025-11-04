@@ -954,7 +954,7 @@ class Payments extends Controller
                     $acs['userid'] = Auth::getUsername();
                     $mess = $data->customers->customername;
 
-                    $_POST['updateamount'] = '0';
+                    $_POST['updateamount'] = 'NULL';
                     $_POST['amount'] = $newmon;
 
                     $acs['activity'] = "Payment Changed Confirmed From $oldmon to $newmon for $mess";
@@ -1051,7 +1051,7 @@ class Payments extends Controller
 
                     $amountPaid =  number_format($amountPaid, 2);
 
-                    $message = "Hi $custName, GHS $amountPaid received. Balance: GHS $balance. Thank you for your payment.";
+                    $message = "Hi $custName, GHS $amountPaid received. Thank you for your payment.";
 
                     singlesendSms($message, $cust->custphone);
                 } catch (Exception $e) {
@@ -1214,13 +1214,52 @@ class Payments extends Controller
 
         $seasid = $_SESSION['seasondata'] != null ? $_SESSION['seasondata']->id : "";
 
+
+        if (isset($_POST['exportexl'])) {
+            if (isset($_GET['search_box'])) {
+                $searching = '%' . $_GET['search_box'] . '%';
+                $query = "SELECT * FROM `payments` JOIN customers  ON payments.customerid = customers.id WHERE payments.`seasonid` ={$seasid} AND (`transid` LIKE :searchs OR customers.`customername` LIKE :searchs OR `reciept` LIKE :searchs OR `amount` LIKE :searchs) ORDER BY payments.id DESC";
+                $arr['searchs'] = $searching;
+                $rowEx = $payments->query($query, $arr);
+            } else {
+                $query = "SELECT * FROM `payments` JOIN customers  ON payments.customerid = customers.id WHERE payments.`seasonid` ={$seasid} ORDER BY payments.id DESC";
+                $rowEx = $payments->query($query);
+            }
+
+            $rowEx = $payments->get_Customer($rowEx);
+            $rowEx = $payments->get_Marketer($rowEx);
+
+            $fields = array('Customer Name', 'Phone', 'Customer Type', 'Officer', 'Receipt No.', 'Transaction Id', 'Mode', 'Amount', 'Date');
+            $excelData = implode("\t", array_values($fields)) . "\n";
+            if ($rowEx) {
+                foreach ($rowEx as $row) {
+
+                    $lineData = array(
+                        esc($row->customername),
+                        esc($row->custphone),
+                        esc($row->custtype),
+                        esc($row->marketer->firstname) . " " . esc($row->marketer->lastname),
+                        esc($row->reciept),
+                        esc($row->transid),
+                        esc($row->modeofpayment),
+                        esc(number_format($row->amount, 2)),
+                        esc(date("d M, Y", strtotime($row->paymentdate)))
+                    );
+                    $excelData .= implode("\t", array_values($lineData)) . "\n";
+                }
+            } else {
+                $excelData .= 'No records found...' . "\n";
+            }
+            export_data_to_excel($fields, $excelData, 'All_Payment_Report');
+        }
+
         if (isset($_GET['search_box'])) {
             $searching = '%' . $_GET['search_box'] . '%';
-            $query = "SELECT * FROM `payments` JOIN customers  ON payments.customerid = customers.id WHERE customers.custtype = 'school' AND payments.`seasonid` ={$seasid} AND (`transid` LIKE :searchs OR customers.`customername` LIKE :searchs OR `reciept` LIKE :searchs OR `amount` LIKE :searchs) ORDER BY payments.id DESC LIMIT $limit OFFSET $offset";
+            $query = "SELECT * FROM `payments` JOIN customers  ON payments.customerid = customers.id WHERE payments.`seasonid` ={$seasid} AND (`transid` LIKE :searchs OR customers.`customername` LIKE :searchs OR `reciept` LIKE :searchs OR `amount` LIKE :searchs) ORDER BY payments.id DESC LIMIT $limit OFFSET $offset";
             $arr['searchs'] = $searching;
             $row = $payments->query($query, $arr);
         } else {
-            $query = "SELECT * FROM `payments` JOIN customers  ON payments.customerid = customers.id WHERE customers.custtype = 'school' AND payments.`seasonid` ={$seasid} ORDER BY payments.id DESC LIMIT $limit OFFSET $offset";
+            $query = "SELECT * FROM `payments` JOIN customers  ON payments.customerid = customers.id WHERE payments.`seasonid` ={$seasid} ORDER BY payments.id DESC LIMIT $limit OFFSET $offset";
             $row = $payments->query($query);
         }
 

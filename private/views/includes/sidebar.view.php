@@ -201,7 +201,7 @@
                  <div class="collapse <?= $actives == 'logs' ? 'show' : '' ?>" id="logs">
                      <ul class="nav flex-column sub-menu">
                          <li class="nav-item"> <a class="nav-link" href="<?= HOME ?>/books/activities">Books Logs</a></li>
-                         <?php if (Auth::getRank() == 'director' || Auth::getRank() == 'g-account') : ?>
+                         <?php if (Auth::access('g-account')) : ?>
                              <li class="nav-item"><a class="nav-link" href="<?= HOME ?>/setups/activitie">Approvals & Logs</a></li>
                          <?php endif; ?>
                      </ul>
