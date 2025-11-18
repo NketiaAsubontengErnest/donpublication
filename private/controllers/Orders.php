@@ -1395,19 +1395,19 @@ class Orders extends Controller
         if (isset($_POST['exportexl'])) {
             if (isset($_GET['search_box'])) {
                 $searching = '%' . $_GET['search_box'] . '%';
-                $query = "SELECT orders.ordernumber, orders.invoiceno, orders.discount, orders.ordertype, orders.officerid, orders.verificid, orders.customerid, orders.issureid, orders.orderdate, customers.customername FROM orders  JOIN customers  ON orders.customerid = customers.id WHERE customers.custtype = 'school' AND orders.`seasonid` ={$seasid} AND (orders.ordertype != '1' AND orders.officerid = :officerid) AND (orders.ordernumber LIKE :search OR customers.customername LIKE :search OR orders.invoiceno LIKE :search) GROUP BY orders.ordernumber";
+                $query = "SELECT orders.ordernumber, orders.invoiceno, orders.discount, orders.ordertype, orders.officerid, orders.verificid, orders.customerid, orders.issureid, orders.orderdate, customers.customername, orders.verifiedDate FROM orders  JOIN customers  ON orders.customerid = customers.id WHERE customers.custtype = 'school' AND orders.`seasonid` ={$seasid} AND (orders.ordertype != '1' AND orders.officerid = :officerid) AND (orders.ordernumber LIKE :search OR customers.customername LIKE :search OR orders.invoiceno LIKE :search) GROUP BY orders.ordernumber";
                 $arr['search'] = $searching;
             } else {
-                $query = "SELECT ordernumber, `invoiceno`, `discount`, `ordertype`, orders.`officerid`, `verificid`, `customerid`, `issureid`, `orderdate` FROM `orders` JOIN customers  ON orders.customerid = customers.id WHERE customers.custtype = 'school' AND orders.`seasonid` ={$seasid} AND (orders.`ordertype` != '1' AND orders.`officerid` = :officerid)  GROUP BY orders.ordernumber ";
+                $query = "SELECT ordernumber, `invoiceno`, `discount`, `ordertype`, orders.`officerid`, `verificid`, `customerid`, `issureid`, `orderdate`, `orderdate`, `verifiedDate` FROM `orders` JOIN customers  ON orders.customerid = customers.id WHERE customers.custtype = 'school' AND orders.`seasonid` ={$seasid} AND (orders.`ordertype` != '1' AND orders.`officerid` = :officerid)  GROUP BY orders.ordernumber ";
             }
 
             $data1 = $orders->findAllDistinct($query, $arr);
             $data1 = $orders->get_TotalSalesOrder($data1);
-            $fields = array('Order Number', 'Invoice', 'Customer', 'Location', 'Phone', 'Region', 'Gross', 'Discount', 'Discount Amount', 'Net Amount');
+            $fields = array('Order Number', 'Invoice', 'Verified Date', 'Customer', 'Location', 'Phone', 'Region', 'Gross', 'Discount', 'Discount Amount', 'Net Amount');
             $excelData = implode("\t", array_values($fields)) . "\n";
             if ($data1) {
                 foreach ($data1 as $row) {
-                    $lineData = array(esc($row->ordernumber), esc($row->invoiceno), esc($row->customers->customername), esc($row->customers->custlocation), esc($row->customers->custphone), esc($row->customers->region), esc(number_format($row->totalOrderSale->totalGrossSales, 2)), esc(number_format($row->discount) . '%'), esc(number_format($row->totalOrderSale->totalDiscount, 2)), esc(number_format($row->totalOrderSale->totalNetSales, 2)));
+                    $lineData = array(esc($row->ordernumber), esc($row->invoiceno), esc($row->verifiedDate), esc($row->customers->customername), esc($row->customers->custlocation), esc($row->customers->custphone), esc($row->customers->region), esc(number_format($row->totalOrderSale->totalGrossSales, 2)), esc(number_format($row->discount) . '%'), esc(number_format($row->totalOrderSale->totalDiscount, 2)), esc(number_format($row->totalOrderSale->totalNetSales, 2)));
                     $excelData .= implode("\t", array_values($lineData)) . "\n";
                 }
                 export_data_to_excel($fields, $excelData, $data1[0]->makerter->firstname . 's_Supply_' . $id);

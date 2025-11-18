@@ -25,7 +25,11 @@
                                     </div>
                                     <div class="col">
                                         <label>Amount GHC</label>
-                                        <input name="amount" id="amount" class="typeahead form-control" type="text" placeholder="20000" required>
+                                        <input name="amount" id="amount" class="typeahead form-control"
+                                            type="text"
+                                            placeholder="<?= number_format($totals['ttSales']->totalNetSales - $totals['ttPayment']->totalpayed, 2); ?>"
+                                            required
+                                            oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/^0+/, '');">
                                     </div>
 
                                     <div class="col">

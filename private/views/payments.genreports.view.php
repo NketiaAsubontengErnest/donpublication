@@ -128,7 +128,7 @@
                                             <?= esc(number_format($row->amout_disco->total_net_returns, 2)) ?>
                                         </td>
                                         <td>
-                                            <?= esc(number_format($row->amout_disco->totaldisc, 2)) ?> (<?=esc(number_format($discoutper))?> %)
+                                            <?= esc(number_format($row->amout_disco->totaldisc, 2)) ?> (<?= esc(number_format($discoutper)) ?> %)
                                         </td>
                                         <td>
                                             <?= esc(number_format($netamt, 2)) ?>
