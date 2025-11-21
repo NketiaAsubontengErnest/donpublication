@@ -87,7 +87,7 @@ class Returns extends Controller
                     unset($_POST['quantsupp']);
                     $_POST['retdate'] = date("Y-m-d");
                     $_POST['idd'] = $id;
-                    $query = "UPDATE `orders` SET retquant=:retquant, retdate=:retdate WHERE `id`= :idd";
+                    $query = "UPDATE `orders` SET retquant= retquant + :retquant, retdate=:retdate WHERE `id`= :idd";
 
                     $orders->query($query, $_POST);
 
@@ -313,7 +313,7 @@ class Returns extends Controller
                     $_POST['pricedate'] = '';
 
                     if ($da->retquant > 0 && $da->retverquantacc < $da->retquant) {
-                        $query = "UPDATE `orders` SET `retverquantacc`=`retquant`, `retverofficer`=:verificid, `retdate`=:retdate WHERE `id` =:orderid";
+                        $query = "UPDATE `orders` SET `retverquantacc`=retverquantacc + `retquant`, `retverofficer`=:verificid, `retdate`=:retdate WHERE `id` =:orderid";
                         $query1 = "UPDATE `books` SET `quantity` =  `quantity` + :qty WHERE `id` = :bookid";
 
                         $orders->query($query, $_POST);
@@ -508,6 +508,8 @@ class Returns extends Controller
         $data = array();
         $orders = new Order();
 
+        $data = $orders->where('id', $id);
+
         if (count($_POST) > 0 && Auth::access('verification')) {
 
             $TempPost = $_POST;
@@ -524,17 +526,19 @@ class Returns extends Controller
                 $query = "UPDATE `orders` SET `retverquantacc` =  `retverquantacc` + :retverquant, `retverofficer` = :retverofficer, `retverdate` = :retverdate WHERE `id` =:ordid";
 
                 if ($_POST['retverquant'] == 0) {
-                    $query = "UPDATE `orders` SET `retquant` = 0 WHERE `id` =$id";
+                    $query = "UPDATE `orders` SET `retquant` = retverquant WHERE `id` =$id";
                     $orders->query($query);
                 } else {
                     $orders->query($query, $_POST);
                 }
 
                 return $this->redirect('returns/verifylist/' . $TempPost['orderid']);
+            } else {
+                $errors = $orders->errors;
             }
         }
 
-        $data = $orders->where('id', $id);
+
 
         //this are for breadcrumb
         $crumbs[] = ['Dashboard', 'dashboard'];
@@ -546,7 +550,8 @@ class Returns extends Controller
                 'rows' => $data,
                 'crumbs' => $crumbs,
                 'hiddenSearch' => $hiddenSearch,
-                'actives' => $actives
+                'actives' => $actives,
+                'errors' => $errors ?? []
             ]);
         } else {
             $crumbs[] = ['Access Denied', ''];
